@@ -1,12 +1,14 @@
 import os
 import sys
 
-# Ensure working directory is the repository root containing 'backend'
+# Ensure root directory containing 'backend' is in sys.path
 script_dir = os.path.dirname(os.path.abspath(__file__))
-if os.path.exists(os.path.join(script_dir, "backend")):
-    root_dir = script_dir
-elif os.path.exists(os.path.join(script_dir, "..", "backend")):
+
+# If script is inside 'backend/', the repository root is parent directory
+if os.path.basename(script_dir) == "backend":
     root_dir = os.path.abspath(os.path.join(script_dir, ".."))
+elif os.path.exists(os.path.join(script_dir, "backend")):
+    root_dir = script_dir
 else:
     root_dir = script_dir
 
@@ -24,6 +26,5 @@ if __name__ == "__main__":
     print(f"  Working Directory: {root_dir}")
     print(f"  URL: http://{host}:{port}")
     print(f"  API Docs: http://{host}:{port}/docs")
-    print("  Switch Room Blueprint: switch/invoiceops-room.template.yaml")
     print("=" * 65)
     uvicorn.run("backend.app.main:app", host=host, port=port, reload=False)
