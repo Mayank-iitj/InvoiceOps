@@ -17,11 +17,13 @@ if root_dir not in sys.path:
 import uvicorn
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
     print("=" * 65)
     print("  Starting InvoiceOps Workbench & API Server")
     print(f"  Working Directory: {root_dir}")
-    print("  URL: http://localhost:8000")
-    print("  API Docs: http://localhost:8000/docs")
+    print(f"  URL: http://{host}:{port}")
+    print(f"  API Docs: http://{host}:{port}/docs")
     print("  Switch Room Blueprint: switch/invoiceops-room.template.yaml")
     print("=" * 65)
-    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("backend.app.main:app", host=host, port=port, reload=False)
