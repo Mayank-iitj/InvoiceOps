@@ -32,9 +32,11 @@ export const AuditTrailPage: React.FC<AuditTrailPageProps> = ({ onSelectInvoice 
     setLoading(true);
     try {
       const data = await api.getGlobalAuditEvents(150, filterAction === 'all' ? undefined : filterAction);
-      setEvents(data.items || []);
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+      setEvents(list);
     } catch (err) {
       console.error("Failed to load audit events", err);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -314,7 +316,7 @@ export const AuditTrailPage: React.FC<AuditTrailPageProps> = ({ onSelectInvoice 
                 </div>
               )}
 
-              {selectedEvent.source_refs && selectedEvent.source_refs.length > 0 && (
+              {Array.isArray(selectedEvent.source_refs) && selectedEvent.source_refs.length > 0 && (
                 <div>
                   <span className="text-text-dim text-[10px] block mb-1">Source Artifact References</span>
                   <div className="space-y-1">

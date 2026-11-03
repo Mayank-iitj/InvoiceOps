@@ -12,11 +12,13 @@ export const VendorsPolicyPage: React.FC<{ initialTab?: 'vendors' | 'policy' }> 
     async function loadData() {
       try {
         const vData = await api.getVendors();
-        setVendors(vData.items || []);
+        const list = Array.isArray(vData) ? vData : (Array.isArray(vData?.items) ? vData.items : []);
+        setVendors(list);
         const pData = await api.getPolicy();
         setPolicy(pData);
       } catch (err) {
         console.error("Failed to load policy data", err);
+        setVendors([]);
       } finally {
         setLoading(false);
       }

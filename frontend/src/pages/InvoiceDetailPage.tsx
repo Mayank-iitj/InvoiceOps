@@ -47,9 +47,11 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailPageProps> = ({
       const data = await api.getInvoice(invoiceId);
       setInvoice(data);
       const auditData = await api.getAuditEvents(invoiceId);
-      setAuditEvents(auditData.items || []);
+      const list = Array.isArray(auditData) ? auditData : (Array.isArray(auditData?.items) ? auditData.items : []);
+      setAuditEvents(list);
     } catch (err) {
       console.error("Failed to load invoice", err);
+      setAuditEvents([]);
     } finally {
       setLoading(false);
     }
@@ -267,7 +269,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailPageProps> = ({
 
             {/* Reconciliation Line Items */}
             <div className="space-y-3.5">
-              {invoice.lines.map((line) => {
+              {(Array.isArray(invoice?.lines) ? invoice.lines : []).map((line) => {
                 const qtyCheck = invoice.latest_match_run?.checks.find(c => c.code === 'QTY_EXCEEDS_RECEIVED');
                 const priceCheck = invoice.latest_match_run?.checks.find(c => c.code === 'PRICE_VARIANCE');
 
@@ -439,7 +441,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailPageProps> = ({
               </div>
             ) : (
               <div className="space-y-2.5">
-                {invoice.open_exceptions.map((exc) => (
+                {(Array.isArray(invoice?.open_exceptions) ? invoice.open_exceptions : []).map((exc) => (
                   <div key={exc.exception_id} className="p-3 bg-red-950/20 border border-red-500/30 rounded-md text-xs space-y-2">
                     <div className="flex items-center justify-between font-mono">
                       <span className="font-bold text-red-400">{exc.code}</span>
@@ -472,7 +474,7 @@ export const InvoiceDetailPage: React.FC<InvoiceDetailPageProps> = ({
             </div>
 
             <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1 font-mono">
-              {auditEvents.map((ev, idx) => (
+              {(Array.isArray(auditEvents) ? auditEvents : []).map((ev, idx) => (
                 <div key={idx} className="text-xs border-l-2 border-supabase-500/60 pl-2.5 py-1 space-y-0.5 bg-dark-bg/40 rounded-r">
                   <div className="flex items-center justify-between text-[10px] text-text-muted">
                     <span className="font-semibold text-supabase-400">{ev.action}</span>

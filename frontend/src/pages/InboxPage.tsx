@@ -40,9 +40,11 @@ export const InboxPage: React.FC<InboxPageProps> = ({
     setLoading(true);
     try {
       const data = await api.getInvoices();
-      setInvoices(data.items || []);
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+      setInvoices(list);
     } catch (err) {
       console.error("Failed to load invoices", err);
+      setInvoices([]);
     } finally {
       setLoading(false);
     }

@@ -46,10 +46,14 @@ export const SwitchRoomModal: React.FC<SwitchRoomModalProps> = ({
 
   const loadMessages = async () => {
     try {
-      const msgs = await api.getSwitchMessages('room_invoiceops_ap', threadId);
-      setMessages(msgs);
+      const res = await api.getSwitchMessages('room_invoiceops_ap', threadId);
+      const list = Array.isArray(res) 
+        ? res 
+        : (Array.isArray(res?.items) ? res.items : (Array.isArray(res?.messages) ? res.messages : []));
+      setMessages(list);
     } catch (err) {
       console.error('Failed to load Switch messages:', err);
+      setMessages([]);
     }
   };
 
@@ -248,7 +252,7 @@ export const SwitchRoomModal: React.FC<SwitchRoomModalProps> = ({
                   </button>
                 </div>
               ) : (
-                messages.map((m) => {
+                (Array.isArray(messages) ? messages : []).map((m) => {
                   const isAgent = m.sender_role === 'agent';
                   const isFinanceApproval = m.action_type === 'payment_voucher_generated' || m.action_type === 'finance_approval';
                   
@@ -302,7 +306,7 @@ export const SwitchRoomModal: React.FC<SwitchRoomModalProps> = ({
                         </div>
 
                         {/* Attached Evidence Chips */}
-                        {m.evidence_refs && m.evidence_refs.length > 0 && (
+                        {Array.isArray(m?.evidence_refs) && m.evidence_refs.length > 0 && (
                           <div className="mt-2.5 flex flex-wrap gap-1.5">
                             {m.evidence_refs.map((ref: string, idx: number) => (
                               <span 

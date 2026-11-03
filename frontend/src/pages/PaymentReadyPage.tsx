@@ -10,9 +10,11 @@ export const PaymentReadyPage: React.FC = () => {
   const loadRecords = async () => {
     try {
       const data = await api.getPaymentReadyRecords();
-      setRecords(data.items || []);
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+      setRecords(list);
     } catch (err) {
       console.error("Failed to load payment-ready records", err);
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -23,9 +25,9 @@ export const PaymentReadyPage: React.FC = () => {
   }, []);
 
   const handleExportCSV = () => {
-    if (records.length === 0) return;
+    if (!Array.isArray(records) || records.length === 0) return;
     const headers = ["Record_ID", "Invoice_ID", "Invoice_Number", "Vendor", "Approved_Amount", "Currency", "Status", "Approved_At", "Payment_Executed"];
-    const rows = records.map(r => [
+    const rows = (Array.isArray(records) ? records : []).map(r => [
       r.payment_ready_record_id,
       r.invoice_id,
       r.invoice_number || 'N/A',
