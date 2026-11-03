@@ -1,0 +1,3 @@
+# Coding/Configuration Prompt — Switch Collaboration
+
+Using the current official Switch Console quickstart, create a single `#invoiceops-ap` room and onboard two agents using `agents/invoiceops-intake.md` and `agents/invoiceops-reconcile.md`. Use `switch/invoiceops-room.template.yaml` as a blueprint and validate fields/placeholders in the installed version. Give each agent narrow InvoiceOps CLI/API access; no finance approval permission, no bank/payment capability, no external email sending, no bypass-permissions mode. Verify the agents share room context, reply to explicit mentions, keep one thread per invoice, route the quantity exception to Procurement, and report real tool errors. Do not write a fake Switch adapter or claim an integration that was not tested.

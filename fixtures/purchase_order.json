@@ -1,0 +1,17 @@
+{
+  "po_id": "PO-2026-0082",
+  "vendor_id": "VND-001",
+  "currency": "INR",
+  "status": "open",
+  "lines": [
+    {
+      "po_line_id": "POL-1",
+      "sku": "LAPTOP-DOCK-01",
+      "description": "USB-C docking station",
+      "ordered_qty": "10",
+      "unit_price": "12000.00",
+      "uom": "each"
+    }
+  ],
+  "synthetic": true
+}

@@ -1,0 +1,27 @@
+{
+  "invoice_id": "INV-2026-1043",
+  "vendor_id": "VND-001",
+  "invoice_number": "NSC 1041-26",
+  "invoice_date": "2026-10-27",
+  "po_id": "PO-2026-0082",
+  "currency": "INR",
+  "lines": [
+    {
+      "invoice_line_id": "IL-1",
+      "sku": "LAPTOP-DOCK-01",
+      "description": "USB-C docking station",
+      "quantity": "8",
+      "unit_price": "12000.00",
+      "net_amount": "96000.00",
+      "tax_rate": "18.00",
+      "tax_amount": "17280.00",
+      "gross_amount": "113280.00"
+    }
+  ],
+  "subtotal": "96000.00",
+  "tax_total": "17280.00",
+  "invoice_total": "113280.00",
+  "document_ref": "DOC-1043",
+  "synthetic": true,
+  "notes": "Duplicate of INV-2026-1041 after normalization; synthetic fixture."
+}

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invoiceops-deployment
+  labels:
+    app: invoiceops
+    tier: api-workbench
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invoiceops
+  template:
+    metadata:
+      labels:
+        app: invoiceops
+    spec:
+      containers:
+        - name: invoiceops
+          image: invoiceops:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: APP_ENV
+              value: "production"
+            - name: SWITCH_SERVER_URL
+              value: "http://switch-core.default.svc.cluster.local:8080"
+            - name: SWITCH_ROOM_ID
+              value: "room_invoiceops_ap"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: invoiceops-service
+  labels:
+    app: invoiceops
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: invoiceops
+

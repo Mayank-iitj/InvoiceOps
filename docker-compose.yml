@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  invoiceops-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: invoiceops-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - SQLITE_DB_PATH=/data/invoiceops.db
+      - SWITCH_SERVER_URL=http://switch-bridge:8080
+      - SWITCH_ROOM_ID=room_invoiceops_ap
+      - LOG_LEVEL=info
+    volumes:
+      - invoiceops_data:/data
+    networks:
+      - invoiceops-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Optional local chat bridge simulating Mattermost / Switch Core Gateway
+  switch-bridge:
+    image: python:3.12-alpine
+    container_name: switch-bridge
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    command: >
+      python -c "
+      import http.server, socketserver, json
+
+      class SwitchHandler(http.server.SimpleHTTPRequestHandler):
+          def do_GET(self):
+              self.send_response(200)
+              self.send_header('Content-type', 'application/json')
+              self.end_headers()
+              self.wfile.write(json.dumps({'status': 'switch_core_online', 'version': '0.40.1'}).encode())
+
+          def do_POST(self):
+              length = int(self.headers.get('content-length', 0))
+              body = self.rfile.read(length).decode('utf-8')
+              self.send_response(200)
+              self.send_header('Content-type', 'application/json')
+              self.end_headers()
+              self.wfile.write(json.dumps({'status': 'dispatched', 'received': body[:100]}).encode())
+
+      with socketserver.TCPServer(('', 8080), SwitchHandler) as httpd:
+          print('Switch Core Gateway mock listening on port 8080...')
+          httpd.serve_forever()
+      "
+    networks:
+      - invoiceops-net
+
+volumes:
+  invoiceops_data:
+    driver: local
+
+networks:
+  invoiceops-net:
+    driver: bridge
+

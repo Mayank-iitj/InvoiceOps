@@ -1,0 +1,38 @@
+{
+  "synthetic_dataset": true,
+  "cases": [
+    {
+      "invoice_id": "INV-2026-1041",
+      "expected_overall": "PASS",
+      "expected_state_before_approval": "ready_for_approval",
+      "reason": "Invoice quantity 8 equals accepted GRN quantity 8; vendor, PO, currency and unit price match."
+    },
+    {
+      "invoice_id": "INV-2026-1042",
+      "expected_overall": "BLOCKED",
+      "expected_exception": "QTY_EXCEEDS_RECEIVED",
+      "expected_state": "exception_open",
+      "reason": "Invoice quantity 10 exceeds accepted GRN quantity 8. PO ordered quantity is 10 but only 8 are accepted in the supplied GRN fixture."
+    },
+    {
+      "invoice_id": "INV-2026-1043",
+      "expected_overall": "BLOCKED",
+      "expected_exception": "DUPLICATE_INVOICE",
+      "expected_state": "duplicate_blocked",
+      "reason": "Same vendor and normalized invoice number as INV-2026-1041."
+    },
+    {
+      "invoice_id": "INV-2026-1044",
+      "expected_overall": "BLOCKED",
+      "expected_exception": "PRICE_VARIANCE",
+      "expected_state": "exception_open",
+      "reason": "Invoice unit price \u20b912,500.00 exceeds PO unit price \u20b912,000.00 beyond the configured demo tolerance."
+    }
+  ],
+  "notes": [
+    "All values are synthetic demo data.",
+    "The matching engine must calculate outcomes; do not hardcode these labels in the UI.",
+    "The quantity-mismatch case remains blocked until additional accepted receipt evidence or a corrected invoice is recorded.",
+    "No payment is initiated."
+  ]
+}

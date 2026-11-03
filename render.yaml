@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: invoiceops-app
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: SWITCH_ROOM_ID
+        value: room_invoiceops_ap
+      - key: ALLOWED_ORIGINS
+        value: "*"
+

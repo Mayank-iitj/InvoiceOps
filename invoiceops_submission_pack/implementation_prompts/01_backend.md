@@ -1,0 +1,3 @@
+# Coding Prompt — Backend Vertical Slice
+
+Implement the InvoiceOps FastAPI backend to the provided PRD/TRD/API/schema. First inspect the repository. Create a modular monolith with Pydantic v2, SQLAlchemy 2 and SQLite. Build Decimal-based three-way matching, duplicate detection, versioned match runs, exception persistence, role-scoped auth, transactional human approval, payment-ready record (no transfer) and append-only audit events. Include synthetic seed/reset commands and pytest coverage. Keep OpenAPI in sync. Do not implement payment rails, bank details, email send or autonomous approvals. Work in small milestones and report test output honestly.
