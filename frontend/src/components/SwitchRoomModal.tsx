@@ -43,6 +43,8 @@ export const SwitchRoomModal: React.FC<SwitchRoomModalProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const threadId = `thread_${activeInvoice}`;
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000';
+  const mcpEndpointUrl = `${currentOrigin}/api/v1/switch/mcp`;
 
   const loadMessages = async () => {
     try {
@@ -413,15 +415,15 @@ export const SwitchRoomModal: React.FC<SwitchRoomModalProps> = ({
                 <div className="space-y-4 font-mono text-[11px]">
                   <div>
                     <span className="text-neutral-400 block mb-1">MCP Endpoint:</span>
-                    <div className="bg-black p-2 rounded border border-white/10 text-neutral-300 break-all select-all">
-                      http://localhost:8000/api/v1/switch/mcp
+                    <div className="bg-black p-2 rounded border border-white/10 text-neutral-300 break-all select-all font-mono">
+                      {mcpEndpointUrl}
                     </div>
                   </div>
 
                   <div>
                     <span className="text-neutral-400 block mb-1">Connect Claude Code:</span>
-                    <div className="bg-black p-2 rounded border border-white/10 text-blue-300 break-all text-[10px] select-all">
-                      claude mcp add invoiceops http://localhost:8000/api/v1/switch/mcp
+                    <div className="bg-black p-2 rounded border border-white/10 text-blue-300 break-all text-[10px] select-all font-mono">
+                      claude mcp add invoiceops {mcpEndpointUrl}
                     </div>
                   </div>
 
