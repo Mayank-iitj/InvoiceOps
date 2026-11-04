@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SwarmCursor } from '../components/SwarmCursor';
 import { 
   FileText, 
   ArrowRight, 
@@ -98,9 +99,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen text-white -mt-14">
       
       {/* =========================================================================
-          1. HERO SECTION: Vibrant Royal Sky + Bold Typography + CTAs
+          1. HERO SECTION: Vibrant Royal Sky + Bold Typography + CTAs + SwarmCursor
           ========================================================================= */}
-      <section className="relative pt-20 pb-24 md:pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-[#1447F0] via-[#1E5BF8] to-[#3B82F6]">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#1447F0] via-[#1E5BF8] to-[#3B82F6]">
+        <SwarmCursor
+          count={700}
+          size={2.5}
+          spread={85}
+          swirl={0.65}
+          color="#ffffff"
+          accentColor="#60A5FA"
+          clickEffect="burst"
+          targets="a, button, [data-swarm-target]"
+          className="pt-20 pb-24 md:pb-32 px-4 sm:px-6 lg:px-8"
+        >
         {/* Subtle radial glow spotlight */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-white/10 blur-[120px] rounded-full pointer-events-none" />
 
@@ -351,6 +363,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
         </div>
+        </SwarmCursor>
 
       </section>
 
