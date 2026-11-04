@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Body, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Body, status, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
-from backend.app.database import get_db
-from backend.app.services.switch_service import SwitchService, DEFAULT_ROOM_ID
+from backend.app.database import get_db, SessionLocal
+from backend.app.services.switch_service import SwitchService, DEFAULT_ROOM_ID, manager, utcnow_iso
 
 router = APIRouter(prefix="/switch", tags=["Switch Collaboration Room"])
 
@@ -82,6 +82,52 @@ def post_room_message(
         auto_react=True
     )
     return msg
+
+
+@router.websocket("/ws/{room_id}")
+async def switch_room_websocket(websocket: WebSocket, room_id: str):
+    """
+    Real-time bi-directional WebSocket connection for Switch collaboration rooms.
+    Streams new messages, agent reactions, MCP actions, and events directly to connected clients.
+    """
+    await manager.connect(room_id, websocket)
+    try:
+        await websocket.send_json({
+            "type": "connected",
+            "room_id": room_id,
+            "timestamp": utcnow_iso(),
+            "message": f"Connected to Switch Realtime Room {room_id}"
+        })
+
+        while True:
+            data = await websocket.receive_json()
+            event_type = data.get("type", "chat")
+
+            if event_type == "ping":
+                await websocket.send_json({"type": "pong", "timestamp": utcnow_iso()})
+                continue
+
+            if event_type == "chat":
+                with SessionLocal() as db:
+                    SwitchService.post_message(
+                        db=db,
+                        room_id=room_id,
+                        thread_id=data.get("thread_id", "thread_INV-2026-1042"),
+                        sender_id=data.get("sender_id", "ap_clerk_1"),
+                        sender_name=data.get("sender_name", "Sarah Chen (AP Clerk)"),
+                        sender_role=data.get("sender_role", "human"),
+                        content=data.get("content", ""),
+                        avatar=data.get("avatar", "user-green"),
+                        mentions=data.get("mentions", []),
+                        evidence_refs=data.get("evidence_refs", []),
+                        action_type=data.get("action_type", "chat"),
+                        action_payload=data.get("action_payload", {}),
+                        auto_react=True
+                    )
+    except WebSocketDisconnect:
+        manager.disconnect(room_id, websocket)
+    except Exception:
+        manager.disconnect(room_id, websocket)
 
 
 @router.post("/rooms/{room_id}/simulate-workflow")
@@ -173,4 +219,3 @@ def invoke_mcp(
 ):
     """Invokes an InvoiceOps tool over MCP."""
     return SwitchService.invoke_mcp_tool(req.tool, req.arguments, db)
-
