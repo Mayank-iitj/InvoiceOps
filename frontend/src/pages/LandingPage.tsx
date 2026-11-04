@@ -441,7 +441,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               'FastAPI & React Studio',
               'Strict Role-Based Auth',
               'Idempotent Approvals',
-              'Clean Mock Extraction',
+              'Verified Data Extraction',
               'Automated Dispute Resolution'
             ].map((tag, idx) => (
               <span

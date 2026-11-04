@@ -188,7 +188,7 @@ def seed_database(db: Session, run_initial_match: bool = True) -> dict:
                     db.add(il)
                 db.flush()
 
-                # Add mock document record
+                # Add synthetic document record
                 doc = Document(
                     id=gen_uuid(),
                     invoice_id=inv.id,
