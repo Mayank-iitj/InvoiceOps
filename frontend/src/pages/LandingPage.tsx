@@ -4,6 +4,7 @@ import { CircularCarousel, CarouselItem, CarouselPreset } from '../components/Ci
 import { AnimatedContent } from '../components/AnimatedContent';
 import { Strands } from '../components/Strands';
 import { ShapeBlur } from '../components/ShapeBlur';
+import { MagicBento, MagicBentoItem } from '../components/MagicBento';
 import { 
   FileText, 
   ArrowRight, 
@@ -61,6 +62,55 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [strandsListening, setStrandsListening] = useState<boolean>(true);
   const [strandsEnergy, setStrandsEnergy] = useState<number>(0.7);
   const [shapeBlurFocus, setShapeBlurFocus] = useState<boolean>(true);
+
+  const bentoItems: MagicBentoItem[] = [
+    {
+      title: 'Real-Time Variance Analytics',
+      description: 'Scrub through dynamic line-item discrepancy rates, de minimis thresholds, and cumulative settlement savings.',
+      label: 'METRICS & DRIFT',
+      visual: 'analytics',
+      onClick: () => onEnterStudio('analytics')
+    },
+    {
+      title: 'High-Volume AP Throughput',
+      description: 'Deterministic 3-way match validation across batch ERP payloads with zero precision loss.',
+      label: 'ERP INGESTION',
+      visual: 'dashboard',
+      onClick: () => onEnterStudio('invoices')
+    },
+    {
+      title: 'Switch Incident Deliberation Rooms',
+      description: 'Multi-persona collaborative threads where AP Clerks, Procurement Leads, and AI Swarm Agents resolve variances in real time.',
+      label: 'COLLABORATIVE RESOLUTION',
+      visual: 'collaboration',
+      colSpan: 2,
+      rowSpan: 2,
+      onClick: onOpenSwitchRoom
+    },
+    {
+      title: 'Autonomous Match & Triage Pipeline',
+      description: 'Continuous CI/CD verification from PDF/EDI intake to decimal mathematical reconciliation and automated tolerance auto-close.',
+      label: 'ZERO-TOUCH AUTOMATION',
+      visual: 'automation',
+      colSpan: 2,
+      rowSpan: 2,
+      onClick: () => onEnterStudio('rules')
+    },
+    {
+      title: 'Omnichannel Integration Hub',
+      description: 'Bidirectional sync across Telegram DevOps bot (@switch_devops_bot), ERP webhooks, and Slack channels.',
+      label: 'CONNECTED ECOSYSTEM',
+      visual: 'integration',
+      onClick: () => onEnterStudio('settings')
+    },
+    {
+      title: '4-Eye Cryptographic Governance',
+      description: 'Strict dual-role separation of duties (AP Clerk vs Finance Approver) with tamper-evident audit logs and non-payment rails.',
+      label: 'FINANCIAL INTEGRITY',
+      visual: 'security',
+      onClick: () => onEnterStudio('audit')
+    }
+  ];
 
   const switchOpsItems: (CarouselItem & { action: string; badge: string; desc: string; cta: string })[] = [
     {
@@ -807,6 +857,65 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           </div>
 
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3.7 SWITCHOPS AUTONOMOUS OPERATIONS MATRIX: REACT BITS <MagicBento />
+          ========================================================================= */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-neutral-950 border-t border-white/10 relative overflow-hidden">
+        {/* Glow backdrop */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-blue-600/10 blur-[130px] rounded-full pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <AnimatedContent distance={40} direction="vertical" duration={0.7} once={true}>
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>INTERACTIVE GOVERNANCE MATRIX &bull; REACT BITS &lt;MagicBento /&gt;</span>
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                Autonomous AP Operations at a Glance
+              </h2>
+              <p className="max-w-2xl mx-auto text-neutral-400 text-sm sm:text-base leading-relaxed">
+                Interact with the dynamic bento below. Scrub the real-time variance curve, observe active deliberation carets, inspect pipeline execution steps, and toggle cryptographic security controls.
+              </p>
+            </div>
+          </AnimatedContent>
+
+          {/* Magic Bento Grid Container */}
+          <div className="w-full">
+            <MagicBento
+              items={bentoItems}
+              columns={4}
+              rowHeight={210}
+              gap={16}
+              radius={24}
+              theme="dark"
+              glowColor="#3b82f6"
+              enableBorderGlow={true}
+              enableSpotlight={true}
+              spotlightRadius={320}
+              enableStars={true}
+              particleCount={28}
+              enableTilt={true}
+              enableMagnetism={true}
+              clickEffect={true}
+              textAutoHide={false}
+              className="w-full"
+            />
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-neutral-500 font-mono">
+            <span className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+              <span>Hover cards for spotlight & 3D tilt</span>
+            </span>
+            <span>&bull;</span>
+            <span>Click cards for ripple wave propagation</span>
+            <span>&bull;</span>
+            <span>Interactive charts & toggles live</span>
+          </div>
         </div>
       </section>
 
