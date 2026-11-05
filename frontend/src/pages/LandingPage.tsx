@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SwarmCursor } from '../components/SwarmCursor';
+import { CircularCarousel, CarouselItem, CarouselPreset } from '../components/CircularCarousel';
 import { 
   FileText, 
   ArrowRight, 
@@ -31,7 +32,9 @@ import {
   Cpu,
   Layers,
   Filter,
-  DollarSign
+  DollarSign,
+  Smartphone,
+  Eye
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -47,6 +50,109 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const [activePreviewTab, setActivePreviewTab] = useState<'all' | '1041' | '1042' | '1043' | '1044'>('all');
   const [activeRuleTab, setActiveRuleTab] = useState<'price' | 'qty' | 'conf' | 'dup'>('price');
+  const [carouselPreset, setCarouselPreset] = useState<CarouselPreset>('cylinder');
+  const [activeCarouselIdx, setActiveCarouselIdx] = useState<number>(0);
+
+  const switchOpsItems: (CarouselItem & { action: string; badge: string; desc: string; cta: string })[] = [
+    {
+      src: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80&auto=format&fit=crop',
+      alt: 'Switch Incident Collaboration Rooms',
+      title: 'Switch Incident Rooms',
+      subtitle: 'Human + Multi-Agent Swarm',
+      action: 'switch-room',
+      badge: 'COLLABORATIVE TRIAGE',
+      desc: 'Dedicated deliberation rooms for disputed invoices with real-time audit threads, evidence uploads, and multi-persona alignment.',
+      cta: 'Open Switch Room'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80&auto=format&fit=crop',
+      alt: 'Deterministic 3-Way Line Matching',
+      title: '3-Way Match Engine',
+      subtitle: 'Pure Decimal Mathematics',
+      action: 'inbox',
+      badge: '100% DETERMINISTIC',
+      desc: 'Line-by-line mathematical reconciliation across POs, Goods Receipts, Delivery Challans, and Invoices with zero hallucination.',
+      cta: 'Inspect Invoices'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=900&q=80&auto=format&fit=crop',
+      alt: 'Telegram DevOps Gateway Bot',
+      title: 'Telegram Gateway',
+      subtitle: '@switch_devops_bot',
+      action: 'telegram',
+      badge: 'MOBILE BOT OPS',
+      desc: 'Live exception broadcasts, mobile invoice triage, /reconcile triggers, and remote approvals via the connected Telegram gateway.',
+      cta: 'Launch @switch_devops_bot'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=900&q=80&auto=format&fit=crop',
+      alt: 'Cryptographic 4-Eye Approval Ledger',
+      title: '4-Eye Approval & Audit',
+      subtitle: 'Strict Downstream Safety',
+      action: 'payment-ready',
+      badge: 'PAYMENT_READY ONLY',
+      desc: 'Strict separation of duties. Produces downstream payment-ready vouchers with zero live banking rails for absolute safety.',
+      cta: 'View Payment-Ready'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900&q=80&auto=format&fit=crop',
+      alt: 'Autonomous AI Intake Agents',
+      title: 'Intake & OCR Agent',
+      subtitle: 'Multimodal Extraction',
+      action: 'inbox',
+      badge: 'ZERO-TOUCH PARSING',
+      desc: 'Extracts structured line items, calculates normalized invoice hashes, and tags OCR confidence scores before reconciliation.',
+      cta: 'View Ingested Queue'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=900&q=80&auto=format&fit=crop',
+      alt: 'Date-Effective Price Amendment Engine',
+      title: 'Price Amendment Rule',
+      subtitle: 'Benchmark Rule R4',
+      action: 'invoice-2008',
+      badge: 'BUYER SIGN-OFF',
+      desc: 'Validates vendor contract amendment dates against purchase orders, blocking future price traps (Scenario S07 vs S08).',
+      cta: 'Inspect Case I-2008'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900&q=80&auto=format&fit=crop',
+      alt: 'Short Shipment & Delivery Recount Triage',
+      title: 'Short Shipment Triage',
+      subtitle: 'Benchmark Rule R3 & R12',
+      action: 'invoice-2006',
+      badge: 'WAREHOUSE LEAD',
+      desc: 'Dispatches physical count disputes and delivery challan discrepancies directly to warehouse ops for recount sign-off.',
+      cta: 'Inspect Case I-2006'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=900&q=80&auto=format&fit=crop',
+      alt: 'Automated De Minimis Tolerance Settlement',
+      title: 'De Minimis Auto-Clear',
+      subtitle: 'Benchmark Rule R1',
+      action: 'invoice-2005',
+      badge: 'AUTO-SETTLED',
+      desc: 'Automatically settles minor variances within ₹500 and 2% with structured audit notes (Scenario S05 auto-closed).',
+      cta: 'Inspect Case I-2005'
+    }
+  ];
+
+  const handleCarouselAction = (item: typeof switchOpsItems[0]) => {
+    if (item.action === 'switch-room') {
+      onOpenSwitchRoom();
+    } else if (item.action === 'inbox') {
+      onEnterStudio('inbox');
+    } else if (item.action === 'payment-ready') {
+      onEnterStudio('payment-ready');
+    } else if (item.action === 'telegram') {
+      window.open('https://t.me/switch_devops_bot', '_blank');
+    } else if (item.action === 'invoice-2005') {
+      onSelectInvoice('I-2005');
+    } else if (item.action === 'invoice-2006') {
+      onSelectInvoice('I-2006');
+    } else if (item.action === 'invoice-2008') {
+      onSelectInvoice('I-2008');
+    }
+  };
 
   const demoInvoices = [
     {
@@ -452,6 +558,111 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </span>
             ))}
           </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
+          3.5 SWITCHOPS 3D CIRCULAR CAROUSEL (React Bits Integration)
+          ========================================================================= */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#121212] via-[#0a0a0a] to-[#181818] border-t border-white/10 relative overflow-hidden">
+        {/* Ambient radial glow background */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-blue-600/10 blur-[140px] rounded-full pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          
+          {/* Section Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-inner">
+              <Zap className="w-3.5 h-3.5" />
+              <span>Interactive 3D SwitchOps Ring</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+              Autonomous Exception Resolution in Motion
+            </h2>
+            <p className="max-w-2xl mx-auto text-neutral-400 text-sm sm:text-base leading-relaxed">
+              Drag, spin, and interact with the SwitchOps collaborative ring. Explore human incident rooms, deterministic matching, mobile Telegram bots, and cryptographic audit safety.
+            </p>
+          </div>
+
+          {/* Preset Camera View Switcher */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+            <span className="text-xs text-neutral-500 font-mono uppercase mr-2 flex items-center">
+              <Eye className="w-3.5 h-3.5 mr-1 text-neutral-400" />
+              Ring Mode:
+            </span>
+            {(['cylinder', 'orbit', 'wheel', 'panorama'] as CarouselPreset[]).map((presetKey) => (
+              <button
+                key={presetKey}
+                onClick={() => setCarouselPreset(presetKey)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold capitalize transition ${
+                  carouselPreset === presetKey
+                    ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] border border-blue-400/50'
+                    : 'bg-neutral-900/80 text-neutral-400 hover:text-white border border-white/10 hover:border-white/20'
+                }`}
+              >
+                {presetKey}
+              </button>
+            ))}
+          </div>
+
+          {/* 3D Circular Carousel Stage */}
+          <div className="relative w-full h-[560px] rounded-3xl bg-neutral-950/60 border border-white/10 backdrop-blur-md overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.85)]">
+            <CircularCarousel
+              items={switchOpsItems}
+              preset={carouselPreset}
+              intro="rise"
+              cardWidth={240}
+              aspectRatio={1.05}
+              gap={26}
+              speed={13}
+              fadeColor="#0a0a0a"
+              captions={true}
+              draggable={true}
+              pauseOnHover={true}
+              focusOnClick={true}
+              onChange={(index) => setActiveCarouselIdx(index)}
+              onItemClick={(item) => handleCarouselAction(item as typeof switchOpsItems[0])}
+            />
+
+            {/* Gesture Hint Pill */}
+            <div className="absolute top-4 right-4 bg-black/60 border border-white/10 rounded-full px-3 py-1 text-[11px] text-neutral-400 font-mono pointer-events-none hidden sm:block">
+              Drag to spin • Click card to open action
+            </div>
+          </div>
+
+          {/* Active Card Callout & Direct Action Bar */}
+          {switchOpsItems[activeCarouselIdx] && (
+            <div className="mt-8 bg-neutral-900/90 border border-white/10 rounded-2xl p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xl backdrop-blur-sm">
+              <div className="space-y-1.5 max-w-2xl">
+                <div className="flex items-center space-x-2.5">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    {switchOpsItems[activeCarouselIdx].badge}
+                  </span>
+                  <span className="text-xs text-neutral-400 font-mono">
+                    Slide {activeCarouselIdx + 1} of {switchOpsItems.length}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-white tracking-tight">
+                  {switchOpsItems[activeCarouselIdx].title}
+                  <span className="ml-2 text-sm font-normal text-neutral-400">
+                    • {switchOpsItems[activeCarouselIdx].subtitle}
+                  </span>
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
+                  {switchOpsItems[activeCarouselIdx].desc}
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleCarouselAction(switchOpsItems[activeCarouselIdx])}
+                className="bg-white hover:bg-neutral-100 text-black font-semibold text-xs sm:text-sm rounded-full px-5 py-2.5 shadow-[0_2px_15px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center space-x-2 shrink-0 active:scale-95 group"
+              >
+                <span>{switchOpsItems[activeCarouselIdx].cta}</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+          )}
 
         </div>
       </section>
