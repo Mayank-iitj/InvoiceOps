@@ -136,13 +136,19 @@ app.include_router(demo.router, prefix="/api/v1")
 app.include_router(switch_rooms.router, prefix="/api/v1")
 app.include_router(telegram_gateway.router, prefix="/api/v1")
 
-# Mount built frontend SPA if available
+# Mount built frontend SPA if available (checks repo root, backend root, and fallback mirrors)
 import os
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist"))
-if os.path.exists(frontend_dist) and os.path.isdir(frontend_dist):
+possible_dist_dirs = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend_dist")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")),
+]
+frontend_dist = next((d for d in possible_dist_dirs if os.path.exists(d) and os.path.isdir(d)), None)
+
+if frontend_dist:
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
 
     @app.get("/{full_path:path}", include_in_schema=False)
