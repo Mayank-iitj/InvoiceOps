@@ -14,12 +14,14 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![Docker Ready](https://img.shields.io/badge/Docker-Multi--Stage-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
-[![Tests Passing](https://img.shields.io/badge/Tests-18%2F18%20Passing-success?style=for-the-badge&logo=pytest&logoColor=white)](backend/tests/test_scenarios.py)
+[![Tests Passing](https://img.shields.io/badge/Tests-34%2F34%20Passing-success?style=for-the-badge&logo=pytest&logoColor=white)](backend/tests/)
+[![Render Deployed](https://img.shields.io/badge/Render-Live%20Production-success?style=for-the-badge&logo=render&logoColor=white)](https://invoiceops-jmdf.onrender.com)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-@switch__devops__bot-blue?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/switch_devops_bot)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
 
 <br/>
 
-[**Live Studio App**](http://localhost:8000) • [**Interactive API Docs**](http://localhost:8000/docs) • [**Switch MCP Manifest**](http://localhost:8000/api/v1/switch/mcp) • [**Health Probe**](http://localhost:8000/health)
+[**Live Production App (Render)**](https://invoiceops-jmdf.onrender.com) • [**Interactive API Docs**](https://invoiceops-jmdf.onrender.com/docs) • [**Switch MCP Manifest**](https://invoiceops-jmdf.onrender.com/api/v1/switch/mcp) • [**Health Probe**](https://invoiceops-jmdf.onrender.com/health) • [**Telegram Gateway**](https://t.me/switch_devops_bot)
 
 </div>
 
@@ -283,40 +285,143 @@ InvoiceOps includes ready-to-deploy configuration manifests for leading cloud pr
 
 ---
 
+## ⚙️ Production Configurations & Environment Variables Reference
+
+InvoiceOps is architected for enterprise production hardening. The entire runtime configuration can be controlled via environment variables or loaded from a `.env` file at the root.
+
+### Environment Configuration Matrix
+
+| Environment Variable | Type | Default Value | Production Recommended | Description & Security Rationale |
+| :--- | :--- | :--- | :--- | :--- |
+| **`APP_ENV`** | String | `demo` | `production` | Enables production security mode, disables verbose stack traces on errors. |
+| **`APP_NAME`** | String | `InvoiceOps` | `InvoiceOps` | Display name of the platform across headers and telemetry logs. |
+| **`HOST`** | String | `0.0.0.0` | `0.0.0.0` | Host IP address to bind server listeners. |
+| **`PORT`** | Integer | `8000` | Dynamic (`$PORT`) | Server port; automatically detected from cloud runtimes (Render, Fly, Railway). |
+| **`DATABASE_URL`** | String | `sqlite:///./data/invoiceops.db` | Persistent SQLite / PostgreSQL URI | Connection string for system of record. Supports persistent volume SQLite or managed PostgreSQL. |
+| **`UPLOAD_DIR`** | String | `./data/uploads` | `/app/data/uploads` | File storage path for ingested supplier invoice PDFs and evidence attachments. |
+| **`MAX_UPLOAD_MB`** | Integer | `15` | `15` | Maximum upload size per invoice file in megabytes (DoS guardrail). |
+| **`ALLOWED_ORIGINS`** | String | `*` | `https://invoiceops-jmdf.onrender.com,...` | Comma-separated list of allowed CORS origins for browser security. |
+| **`JWT_SECRET`** | String | `demo-secret-...` | `<high-entropy-256-bit-key>` | Secret signing key for session tokens and administrative API operations. |
+| **`DEFAULT_CURRENCY`** | String | `INR` | `INR` | Default ISO currency code for financial matching and display. |
+| **`SWITCH_SERVER_URL`**| String | `http://localhost:8080` | `https://switch-core.internal` | Base URL of the Switch multi-agent network daemon. |
+| **`SWITCH_ROOM_ID`** | String | `room_invoiceops_ap` | `room_invoiceops_ap` | Collaborative thread identifier for the AP reconciliation channel. |
+| **`TELEGRAM_BOT_TOKEN`**| String | `9009274250:AAHu...` | Configured via Secret Manager | Telegram Bot API authentication token. |
+| **`TELEGRAM_BOT_USERNAME`**| String | `@switch_devops_bot` | `@switch_devops_bot` | Public Telegram bot handle for user-facing interactions. |
+| **`TELEGRAM_GATEWAY_ENABLED`**| Boolean | `true` | `true` | Master switch to enable or disable the Telegram chat gateway service. |
+| **`TELEGRAM_POLLING`** | Boolean | `true` | `false` (Webhook) / `true` (Worker)| Toggles background polling loop. Set to `false` when using webhooks on Render. |
+| **`PRICE_VARIANCE_PERCENT`**| Decimal| `0.50` | `0.50` | Maximum relative percentage price variance allowed (0.50%). |
+| **`PRICE_VARIANCE_ABSOLUTE_PAISE`**| Decimal| `100` | `100` | Absolute tolerance in paise (100 paise = ₹1.00 INR). |
+| **`QUANTITY_TOLERANCE`**| Decimal| `0` | `0` | Strict zero tolerance on unreceived physical goods over-billing. |
+| **`EXTRACTION_CONFIDENCE_THRESHOLD`**| Float | `0.90` | `0.90` | Confidence cutoff (0.0 to 1.0); lower confidence requires clerk review. |
+| **`POLICY_VERSION`** | String | `demo-policy-1.0` | `v2026.11-enterprise` | Audit log policy engine version tag. |
+| **`AUDIT_RETENTION_DAYS`**| Integer | `365` | `2555` (7 years) | Immutable audit trail retention window for regulatory compliance. |
+
+---
+
+### 🌐 Live Production Deployment (Render)
+
+InvoiceOps is continuously deployed and operational on Render:
+
+- **Public Production Web Studio**: [https://invoiceops-jmdf.onrender.com](https://invoiceops-jmdf.onrender.com)
+- **Health Check & Telemetry**: [https://invoiceops-jmdf.onrender.com/health](https://invoiceops-jmdf.onrender.com/health)
+- **Interactive Swagger / OpenAPI Docs**: [https://invoiceops-jmdf.onrender.com/docs](https://invoiceops-jmdf.onrender.com/docs)
+- **Live Switch MCP Manifest**: [https://invoiceops-jmdf.onrender.com/api/v1/switch/mcp](https://invoiceops-jmdf.onrender.com/api/v1/switch/mcp)
+- **Active Telegram Webhook**: [https://invoiceops-jmdf.onrender.com/api/v1/telegram/webhook](https://invoiceops-jmdf.onrender.com/api/v1/telegram/webhook)
+- **Telegram Gateway Bot**: [@switch_devops_bot](https://t.me/switch_devops_bot)
+
+#### Render Production Runbook
+
+1. **Automated Blueprint Configuration (`render.yaml`)**:
+   ```yaml
+   services:
+     - type: web
+       name: invoiceops-app
+       env: docker
+       dockerfilePath: Dockerfile
+       plan: free
+       healthCheckPath: /health
+       envVars:
+         - key: APP_ENV
+           value: production
+         - key: SWITCH_ROOM_ID
+           value: room_invoiceops_ap
+         - key: ALLOWED_ORIGINS
+           value: "*"
+         - key: TELEGRAM_GATEWAY_ENABLED
+           value: "true"
+         - key: TELEGRAM_BOT_TOKEN
+           sync: false
+   ```
+
+2. **Managing Telegram Webhook via CLI**:
+   ```bash
+   # Register public Render HTTPS webhook with Telegram
+   python backend/cli.py telegram set-webhook https://invoiceops-jmdf.onrender.com/api/v1/telegram/webhook
+
+   # Inspect active webhook delivery metrics & pending queue
+   python backend/cli.py telegram webhook-info
+
+   # Revert to polling mode if running in local development
+   python backend/cli.py telegram delete-webhook
+   ```
+
+3. **Database & Persistent Disks**:
+   For enterprise persistent state across container builds:
+   - Attach a Render Persistent Disk at mount path `/app/data`
+   - Specify `DATABASE_URL=sqlite:////app/data/invoiceops.db` and `UPLOAD_DIR=/app/data/uploads`
+
+---
+
 ## 🧪 Comprehensive Verification & Test Suite
 
-All 18 mission-critical test scenarios are automated and verified via pytest:
+The test suite covers **34 mission-critical automated tests** across matching logic, consequential permissions, the AP benchmark (Scenarios S01–S12), and the Telegram Chat Gateway:
 
 ```bash
-python -m pytest backend/tests/test_scenarios.py -v
+python -m pytest backend/tests -v
 ```
 
-### Verified Test Run (18/18 Passing)
+### Verified Test Run (34/34 Passing)
 ```text
 ============================= test session starts =============================
-platform win32 -- Python 3.14.10, pytest-9.0.2, pluggy-1.6.0
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
 rootdir: C:\Users\MS\Downloads\InvoiceOps_Submission_Documentation_Pack
 
-backend/tests/test_scenarios.py::test_t01_valid_invoice_passes_and_ready_for_approval PASSED [  5%]
-backend/tests/test_scenarios.py::test_t02_quantity_mismatch_blocks_approval PASSED [ 11%]
-backend/tests/test_scenarios.py::test_t03_price_variance_blocks_and_routes_to_procurement PASSED [ 16%]
-backend/tests/test_scenarios.py::test_t04_po_not_found PASSED            [ 22%]
-backend/tests/test_scenarios.py::test_t05_grn_missing PASSED             [ 27%]
-backend/tests/test_scenarios.py::test_t06_duplicate_vendor_and_normalized_number PASSED [ 33%]
-backend/tests/test_scenarios.py::test_t07_duplicate_document_hash PASSED [ 38%]
-backend/tests/test_scenarios.py::test_t08_low_confidence_requires_human_review PASSED [ 44%]
-backend/tests/test_scenarios.py::test_t09_malformed_currency_rejected PASSED [ 50%]
-backend/tests/test_scenarios.py::test_t10_agent_attempt_approval_denied_with_403 PASSED [ 55%]
-backend/tests/test_scenarios.py::test_t11_ap_clerk_attempt_approval_denied_with_403 PASSED [ 61%]
-backend/tests/test_scenarios.py::test_t12_finance_approval_stale_match_denied_with_409 PASSED [ 66%]
-backend/tests/test_scenarios.py::test_t13_approval_repeated_with_same_idempotency_key PASSED [ 72%]
-backend/tests/test_scenarios.py::test_t14_invoice_contains_prompt_injection_text PASSED [ 77%]
-backend/tests/test_scenarios.py::test_t15_file_exceeds_max_size_returns_413 PASSED [ 83%]
-backend/tests/test_scenarios.py::test_t16_resolved_exception_and_rematch_passes PASSED [ 88%]
-backend/tests/test_scenarios.py::test_t17_switch_room_message_and_reactive_agent_reply PASSED [ 94%]
-backend/tests/test_scenarios.py::test_t18_switch_mcp_server_and_tool_invocation PASSED [100%]
+backend/tests/test_scenarios.py::test_t01_valid_invoice_passes_and_ready_for_approval PASSED [  2%]
+backend/tests/test_scenarios.py::test_t02_quantity_mismatch_blocks_approval PASSED [  5%]
+backend/tests/test_scenarios.py::test_t03_price_variance_blocks_and_routes_to_procurement PASSED [  8%]
+backend/tests/test_scenarios.py::test_t04_po_not_found PASSED            [ 11%]
+backend/tests/test_scenarios.py::test_t05_grn_missing PASSED             [ 14%]
+backend/tests/test_scenarios.py::test_t06_duplicate_vendor_and_normalized_number PASSED [ 17%]
+backend/tests/test_scenarios.py::test_t07_duplicate_document_hash PASSED [ 20%]
+backend/tests/test_scenarios.py::test_t08_low_confidence_requires_human_review PASSED [ 23%]
+backend/tests/test_scenarios.py::test_t09_malformed_currency_rejected PASSED [ 26%]
+backend/tests/test_scenarios.py::test_t10_agent_attempt_approval_denied_with_403 PASSED [ 29%]
+backend/tests/test_scenarios.py::test_t11_ap_clerk_attempt_approval_denied_with_403 PASSED [ 32%]
+backend/tests/test_scenarios.py::test_t12_finance_approval_stale_match_denied_with_409 PASSED [ 35%]
+backend/tests/test_scenarios.py::test_t13_approval_repeated_with_same_idempotency_key PASSED [ 38%]
+backend/tests/test_scenarios.py::test_t14_invoice_contains_prompt_injection_text PASSED [ 41%]
+backend/tests/test_scenarios.py::test_t15_file_exceeds_max_size_returns_413 PASSED [ 44%]
+backend/tests/test_scenarios.py::test_t16_resolved_exception_and_rematch_passes PASSED [ 47%]
+backend/tests/test_scenarios.py::test_t17_switch_room_message_and_reactive_agent_reply PASSED [ 50%]
+backend/tests/test_scenarios.py::test_t18_switch_mcp_server_and_tool_invocation PASSED [ 52%]
+backend/tests/test_scenarios.py::test_t19_switch_realtime_websocket_and_algorithms PASSED [ 55%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenarios_s01_to_s04_pass PASSED [ 58%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s05_tolerance_auto_close PASSED [ 61%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s06_short_ship PASSED [ 64%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s07_price_variance_rejected PASSED [ 67%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s08_price_variance_amendment PASSED [ 70%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s09_uom_mismatch PASSED [ 73%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s10_duplicate_prior_billing PASSED [ 76%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s11_extra_freight_charge PASSED [ 79%]
+backend/tests/test_ap_benchmark.py::test_benchmark_scenario_s12_quantity_conflict PASSED [ 82%]
+backend/tests/test_telegram_gateway.py::test_telegram_status_endpoint PASSED [ 85%]
+backend/tests/test_telegram_gateway.py::test_telegram_webhook_start_command PASSED [ 88%]
+backend/tests/test_telegram_gateway.py::test_telegram_webhook_invoices_command PASSED [ 91%]
+backend/tests/test_telegram_gateway.py::test_telegram_webhook_reconcile_command PASSED [ 94%]
+backend/tests/test_telegram_gateway.py::test_telegram_webhook_simulate_command PASSED [ 97%]
+backend/tests/test_telegram_gateway.py::test_telegram_broadcast_endpoint PASSED [100%]
 
-======================= 18 passed in 19.73s =======================
+======================= 34 passed in 24.12s =======================
 ```
 
 ---

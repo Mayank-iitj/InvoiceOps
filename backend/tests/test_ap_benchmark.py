@@ -125,3 +125,4 @@ def test_benchmark_scenario_s12_quantity_conflict():
         assert "warehouse_lead" in owners
     finally:
         db.close()
+
