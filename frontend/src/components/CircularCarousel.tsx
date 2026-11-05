@@ -1056,3 +1056,4 @@ export const CircularCarousel: React.FC<CircularCarouselProps> = ({
 };
 
 export default CircularCarousel;
+

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { SwarmCursor } from '../components/SwarmCursor';
 import { CircularCarousel, CarouselItem, CarouselPreset } from '../components/CircularCarousel';
+import { AnimatedContent } from '../components/AnimatedContent';
+import { Strands } from '../components/Strands';
+import { ShapeBlur } from '../components/ShapeBlur';
 import { 
   FileText, 
   ArrowRight, 
@@ -34,7 +37,10 @@ import {
   Filter,
   DollarSign,
   Smartphone,
-  Eye
+  Eye,
+  Volume2,
+  VolumeX,
+  Sparkles
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -52,6 +58,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activeRuleTab, setActiveRuleTab] = useState<'price' | 'qty' | 'conf' | 'dup'>('price');
   const [carouselPreset, setCarouselPreset] = useState<CarouselPreset>('cylinder');
   const [activeCarouselIdx, setActiveCarouselIdx] = useState<number>(0);
+  const [strandsListening, setStrandsListening] = useState<boolean>(true);
+  const [strandsEnergy, setStrandsEnergy] = useState<number>(0.7);
+  const [shapeBlurFocus, setShapeBlurFocus] = useState<boolean>(true);
 
   const switchOpsItems: (CarouselItem & { action: string; badge: string; desc: string; cta: string })[] = [
     {
@@ -232,18 +241,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span>Deterministic 3-Way Matching Engine</span>
           </div>
 
-          {/* Hero Headline: Bold Modern Sans + High-Contrast Italic Serif */}
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 leading-[1.05]">
-            Match once. <br />
-            <span className="font-serif italic font-normal text-blue-100 tracking-normal drop-shadow-sm">
-              Reconcile anytime.
-            </span>
-          </h1>
+          {/* Hero Headline: AnimatedContent Mount Reveal */}
+          <AnimatedContent distance={35} duration={0.8} delay={0.05} ease="power3.out" trigger="mount">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 leading-[1.05]">
+              Match once. <br />
+              <span className="font-serif italic font-normal text-blue-100 tracking-normal drop-shadow-sm">
+                Reconcile anytime.
+              </span>
+            </h1>
 
-          {/* Hero Subhead */}
-          <p className="max-w-2xl text-base sm:text-lg text-white/90 leading-relaxed font-normal mb-8">
-            InvoiceOps autonomously ingests vendor invoices, executes deterministic 3-way line-item matching against POs and GRNs with Decimal arithmetic, and resolves exceptions in real-time Switch collaboration rooms.
-          </p>
+            {/* Hero Subhead */}
+            <p className="max-w-2xl text-base sm:text-lg text-white/90 leading-relaxed font-normal mb-8">
+              InvoiceOps autonomously ingests vendor invoices, executes deterministic 3-way line-item matching against POs and GRNs with Decimal arithmetic, and resolves exceptions in real-time Switch collaboration rooms.
+            </p>
+          </AnimatedContent>
 
           {/* CTA Buttons (Black Pill + White Pill matching Supaste) */}
           <div className="flex flex-col sm:flex-row items-center gap-3.5 mb-5 w-full sm:w-auto">
@@ -668,6 +679,138 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* =========================================================================
+          3.6 SWITCHOPS NEURAL CORE: REACT BITS <Strands /> INTERACTIVE ORB
+          ========================================================================= */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-neutral-950 border-t border-white/10 relative overflow-hidden">
+        {/* Glow backdrop */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-blue-600/10 blur-[130px] rounded-full pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          
+          <AnimatedContent distance={40} duration={0.8} ease="power3.out">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-inner">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>SwitchOps Autonomous Swarm Core</span>
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                Real-Time Exception Deliberation Sphere
+              </h2>
+              <p className="max-w-2xl mx-auto text-neutral-400 text-sm sm:text-base leading-relaxed">
+                Powered by React Bits <span className="text-cyan-300 font-mono">&lt;Strands /&gt;</span>. Interact directly with the WebGL2 neural orb representing active agent consensus across Intake, Reconcile, and Telegram triage streams.
+              </p>
+            </div>
+          </AnimatedContent>
+
+          {/* Interactive Strands Canvas & Swarm Control Deck */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-black/60 rounded-3xl border border-white/15 p-6 sm:p-10 backdrop-blur-md shadow-[0_20px_70px_rgba(0,0,0,0.85)]">
+            
+            {/* Left: WebGL2 Strands Orb Canvas */}
+            <div className="lg:col-span-7 flex flex-col items-center justify-center">
+              <div className="relative w-full h-[360px] sm:h-[440px] flex items-center justify-center">
+                <Strands
+                  listening={strandsListening}
+                  energy={strandsEnergy}
+                  glassSize={1.05}
+                  speed={1.15}
+                  amplitude={1.1}
+                  waviness={1.2}
+                  interactive={true}
+                  clickPulse={true}
+                  intro={true}
+                  className="rounded-2xl"
+                />
+
+                {/* Interactive Click Tip Overlay */}
+                <div className="absolute bottom-3 bg-black/70 border border-white/10 rounded-full px-3.5 py-1 text-[11px] text-neutral-400 font-mono pointer-events-none">
+                  Hover to tilt • Click to pulse motion waves
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Live Agent Swarm Activity Panel */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-white font-semibold">Swarm Consensus: Active</span>
+                </div>
+                <span className="text-[11px] font-mono text-cyan-400">WebSocket 24ms</span>
+              </div>
+
+              {/* Swarm Agent Rows */}
+              <div className="space-y-3">
+                <div className="bg-neutral-900/80 border border-white/10 rounded-xl p-3.5 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                      <Bot className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white">Intake & Parser Agent</div>
+                      <div className="text-[10px] text-neutral-400">Fingerprinting SHA-256 line items</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">READY</span>
+                </div>
+
+                <div className="bg-neutral-900/80 border border-white/10 rounded-xl p-3.5 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center">
+                      <Scale className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white">Reconciliation Agent</div>
+                      <div className="text-[10px] text-neutral-400">Pure Decimal 3-way matching</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">MATCHED</span>
+                </div>
+
+                <div className="bg-neutral-900/80 border border-white/10 rounded-xl p-3.5 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+                      <Smartphone className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white">Telegram Gateway Bot</div>
+                      <div className="text-[10px] text-neutral-400">@switch_devops_bot webhook polling</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">CONNECTED</span>
+                </div>
+              </div>
+
+              {/* Controls Bar for Strands Orb */}
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setStrandsListening(!strandsListening)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-2 transition ${
+                    strandsListening
+                      ? 'bg-cyan-500 text-black shadow-md'
+                      : 'bg-neutral-800 text-neutral-300 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {strandsListening ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                  <span>{strandsListening ? 'Listening Wave: ON' : 'Listening Wave: OFF'}</span>
+                </button>
+
+                <button
+                  onClick={() => onOpenSwitchRoom()}
+                  className="bg-white/10 hover:bg-white/20 text-white font-semibold text-xs rounded-full px-4 py-1.5 border border-white/15 transition flex items-center space-x-1.5"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Open Switch Room</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* =========================================================================
           4. REUSE ANYTHING WITHOUT SWITCHING APPS (Image 1 from user upload)
              Tailored: "Reconcile Everything Without Switching Apps"
           ========================================================================= */}
@@ -971,8 +1114,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          {/* 6 Clean Cards in 3x2 Grid from Image 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* 6 Clean Cards in 3x2 Grid from Image 3 wrapped in AnimatedContent stagger */}
+          <AnimatedContent distance={45} duration={0.8} stagger={0.08} threshold={0.1} className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Card 1: Procurement Teams */}
             <div className="bg-neutral-900/90 border border-white/10 rounded-3xl p-7 flex flex-col justify-between shadow-xl hover:border-blue-500/40 transition-all group">
@@ -1071,6 +1215,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
           </div>
+          </AnimatedContent>
 
         </div>
       </section>
@@ -1081,13 +1226,61 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#121212]">
         <div className="max-w-5xl mx-auto">
           
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-              Smarter, Faster, and Guardrailed Across Your Enterprise
-            </h2>
-            <p className="max-w-2xl mx-auto text-neutral-400 text-sm sm:text-base leading-relaxed">
-              Keep finance operations audit-ready with strict human-in-the-loop approvals, auto-detect duplicate invoices across vendor IDs, and collaborate in real time with AI agents in Switch rooms.
-            </p>
+          <AnimatedContent distance={40} duration={0.8} ease="power3.out">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+                Smarter, Faster, and Guardrailed Across Your Enterprise
+              </h2>
+              <p className="max-w-2xl mx-auto text-neutral-400 text-sm sm:text-base leading-relaxed">
+                Keep finance operations audit-ready with strict human-in-the-loop approvals, auto-detect duplicate invoices across vendor IDs, and collaborate in real time with AI agents in Switch rooms.
+              </p>
+            </div>
+          </AnimatedContent>
+
+          {/* Interactive React Bits <ShapeBlur /> Cryptographic Inspection Lens */}
+          <div className="mb-10 bg-neutral-900/90 border border-white/10 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-2xl relative">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-semibold flex items-center">
+                  <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+                  Forensic Cryptographic Inspection Lens (&lt;ShapeBlur /&gt;)
+                </span>
+                <h3 className="text-xl font-bold text-white mt-1">Tamper-Proof Audit & Non-Payment Boundary</h3>
+              </div>
+              <button
+                onClick={() => setShapeBlurFocus(!shapeBlurFocus)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition shrink-0"
+              >
+                Lens Mode: {shapeBlurFocus ? 'Hover to Focus' : 'Permanent Focus'}
+              </button>
+            </div>
+
+            <div className="relative w-full h-[220px] rounded-2xl overflow-hidden border border-white/10 bg-black/70">
+              <ShapeBlur
+                shape="rect"
+                color="#2563eb"
+                blur={18}
+                lensSize={0.34}
+                lensSoftness={0.7}
+                chroma={0.35}
+                focus={shapeBlurFocus}
+                idle={true}
+              >
+                <div className="text-center p-4 max-w-lg mx-auto pointer-events-none">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-600/30 border border-blue-400/40 flex items-center justify-center mx-auto mb-2 shadow-[0_0_25px_rgba(37,99,235,0.4)]">
+                    <Lock className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-lg font-bold text-white tracking-tight">Verified 4-Eye Approval Seal</div>
+                  <div className="font-mono text-xs text-blue-300 mt-0.5">SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                  <div className="mt-2 text-xs text-neutral-300">
+                    Downstream payment-ready vouchers release strictly after authorized human sign-off. Zero banking rails exist.
+                  </div>
+                </div>
+              </ShapeBlur>
+            </div>
+            <div className="mt-3 text-center text-xs text-neutral-400 font-mono">
+              Hover pointer across the canvas to inspect the cryptographic seal through the forensic lens
+            </div>
           </div>
 
           {/* Dual Panel macOS Style Window Preview */}
@@ -1213,8 +1406,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          {/* 4 Vertical Device Style Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* 4 Vertical Device Style Cards wrapped in AnimatedContent stagger */}
+          <AnimatedContent distance={40} duration={0.8} stagger={0.1} threshold={0.1} className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Role Card 1 */}
             <div className="bg-neutral-900 border border-white/10 rounded-3xl p-6 flex flex-col justify-between shadow-xl hover:border-blue-500/40 transition-all group">
@@ -1337,6 +1531,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
           </div>
+          </AnimatedContent>
 
         </div>
       </section>
