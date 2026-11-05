@@ -156,4 +156,8 @@ if frontend_dist:
         file_path = os.path.join(frontend_dist, full_path)
         if full_path and os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
-        return FileResponse(os.path.join(frontend_dist, "index.html"))
+        response = FileResponse(os.path.join(frontend_dist, "index.html"))
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
