@@ -1,0 +1,6 @@
+vendor_id,vendor_name,gstin,payment_terms,billing_email,category,freight_terms
+V01,Narmada Industrial Supplies,24AAACN1001A1Z5,Net 30,accounts@narmada-ind.example,Industrial,Extra
+V02,Kaveri Packaging Co,29AAACK2002B1Z3,Net 45,billing@kaveripack.example,Packaging,Extra
+V03,Himadri Electricals,19AAACH3003C1Z1,Net 30,ar@himadri-elec.example,Electrical,Extra
+V04,Sahyadri Safety Gear,27AAACS4004D1Z9,Net 30,invoices@sahyadri-safety.example,Safety,Prepaid - included in unit price
+V05,Brahmaputra Office Mart,18AAACB5005E1Z7,Net 15,dues@brahmaputra-mart.example,Office,Extra

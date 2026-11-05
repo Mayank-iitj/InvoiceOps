@@ -1,0 +1,7 @@
+history_id,vendor_id,date,issue_type,amount_inr,resolution,resolved_by
+H-01,V03,2026-06-18,price_var,3200,Credit note received,Ananya Rao
+H-02,V01,2026-08-04,short_ship,4350,Backorder delivered; short-pay released,Meera Joshi
+H-03,V05,2026-07-22,duplicate,22100,Duplicate rejected; vendor re-sent invoice under new number,Meera Joshi
+H-04,V04,2026-05-13,extra_charge,1800,Freight line rejected per prepaid-freight terms,Rohit Menon
+H-05,V02,2026-08-30,price_var,1500,Accepted; price amendment on file,Rohit Menon
+H-06,V01,2026-09-10,uom,2760,Corrected invoice issued,Ananya Rao

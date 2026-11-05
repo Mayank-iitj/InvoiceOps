@@ -1,0 +1,13 @@
+scenario,invoice_id,invoice_no,expected_route,expected_cause,expected_resolution,deciding_role,disputed_amount_inr_pre_gst,max_human_questions,key_evidence,trap
+S01,I-2001,INV-V01-2201,NO_ROOM,none,"Auto-pass, full match",,0,0,,
+S02,I-2002,KP/10/0412,NO_ROOM,none,"Auto-pass, full match",,0,0,,
+S03,I-2003,HE-8815,NO_ROOM,none,"Auto-pass, full match",,0,0,,
+S04,I-2004,SSG/2610/77,NO_ROOM,none,"Auto-pass, full match",,0,0,,
+S05,I-2005,BOM-5531,NO_ROOM,within_tolerance,Auto-close with note; SKU-502 billed 160 vs 156,,80,0,,Must not open a room
+S06,I-2006,INV-V01-2209,ROOM,short_ship,Short-pay 40 x 145; await backorder,warehouse_lead,5800,1,GRN-4412 qty 160 vs invoice 200; DC-V01-012 160,Do not pay full invoice
+S07,I-2007,HE-8842,ROOM,price_var,Reject variance; request credit note or corrected invoice at 620,buyer,6000,1,price_list SKU-303 695 effective 2026-10-20 is after PO date 2026-10-02 and invoice date,Do not treat the future price row as justification
+S08,I-2008,KP/10/0431,ROOM,price_var,Accept variance; update PO price to 410,buyer,2250,1,price_list SKU-203 410 effective 2026-09-15 is before PO date 2026-09-22,Must not call this an overcharge
+S09,I-2009,INV-V01-2214,ROOM,uom,Reject; request corrected invoice (20 BOX at 920),ap_manager,1821600,1,Invoice 2000 EA at 920 vs PO 20 BOX at 920; price_list note says per BOX,Disputed over 50000 so ap_manager must approve
+S10,I-2010,BOM-5602,ROOM,duplicate,Reject as duplicate of BOM-5490; do not pay,ap_clerk,41400,1,"Same vendor, PO, SKU, qty, amount as I-2000 which is paid 2026-10-08","GRN matches, so a naive match passes; must check prior billing"
+S11,I-2011,SSG/2610/91,ROOM,extra_charge,Reject freight line of 2400,buyer,2400,1,vendors.csv V04 freight_terms prepaid; H-04 prior rejection,Do not accept freight
+S12,I-2012,BOM-5617,ROOM,conflict,Short-pay 8 x 890 after recount,warehouse_lead,7120,2,GRN-4420 32 and DC-V05-020 32 vs lead says 40,Must not assert 40 or 32 as fact before recount; escalate

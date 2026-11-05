@@ -1,0 +1,24 @@
+invoice_id,line_no,sku,description,uom,qty_invoiced,unit_price_inr,line_amount_inr
+I-2000,1,SKU-503,Mesh office chair,EA,12,3450,41400
+I-2001,1,SKU-101,Hydraulic hose 1/2in 10m,EA,12,1850,22200
+I-2001,2,SKU-103,Hose clamp SS pack of 10,PK,30,240,7200
+I-2002,1,SKU-201,Corrugated box 5-ply 18x12x10,EA,500,38,19000
+I-2002,2,SKU-202,Packing tape 48mm 100m,ROLL,120,62,7440
+I-2003,1,SKU-301,MCB 32A 2-pole,EA,40,410,16400
+I-2003,2,SKU-302,Copper cable 2.5mm 90m,COIL,12,2150,25800
+I-2004,1,SKU-401,Safety helmet,EA,60,285,17100
+I-2004,2,SKU-402,Safety gloves,PAIR,200,78,15600
+I-2005,1,SKU-501,A4 paper 75gsm,REAM,100,268,26800
+I-2005,2,SKU-502,Marker box (12 pcs),BOX,20,160,3200
+I-2006,1,SKU-104,Hydraulic elbow fitting 90deg,EA,200,145,29000
+I-2006,2,SKU-105,Pipe sealant tube 50g,EA,100,62,6200
+I-2007,1,SKU-303,LED panel light 40W,EA,80,695,55600
+I-2008,1,SKU-203,Stretch film 500mm 20mic,ROLL,150,410,61500
+I-2008,2,SKU-204,Bubble wrap 1m x 50m,ROLL,40,540,21600
+I-2009,1,SKU-106,Hex bolt M12 (box of 100),EA,2000,920,1840000
+I-2010,1,SKU-503,Mesh office chair,EA,12,3450,41400
+I-2011,1,SKU-404,Fire extinguisher 4kg ABC,EA,30,1180,35400
+I-2011,2,SKU-405,First aid kit,EA,25,640,16000
+I-2011,3,FRT,Freight and handling,LS,1,2400,2400
+I-2012,1,SKU-505,Wireless keyboard,EA,40,890,35600
+I-2012,2,SKU-506,Mouse pad,EA,100,95,9500

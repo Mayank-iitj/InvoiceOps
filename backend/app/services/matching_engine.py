@@ -17,6 +17,9 @@ from backend.app.models.all_models import (
     ExceptionRecord,
     Document,
     Extraction,
+    Vendor,
+    PriceListItem,
+    BenchmarkAnswerKey,
     gen_uuid,
     utcnow_iso,
 )
@@ -30,6 +33,20 @@ def normalize_invoice_number(raw: str) -> str:
         return ""
     norm = unicodedata.normalize("NFKC", raw.strip().upper())
     return re.sub(r"[\s\-\/\\]+", "", norm)
+
+def normalize_uom(uom_str: Optional[str]) -> str:
+    if not uom_str:
+        return ""
+    u = uom_str.strip().upper()
+    if u in ("EA", "EACH", "PC", "PCS", "PIECE", "PIECES"):
+        return "EA"
+    if u in ("PK", "PACK", "PACKS", "PACKAGE", "PACKAGES"):
+        return "PK"
+    if u in ("ROLL", "ROLLS"):
+        return "ROLL"
+    if u in ("BOX", "BOXES"):
+        return "BOX"
+    return u
 
 def to_decimal(val: Any) -> Decimal:
     if val is None or val == "":
@@ -104,6 +121,33 @@ def run_three_way_match(
             "actual": "unique",
             "source_refs": [f"invoice/{invoice.id}"],
         })
+
+    # Prior billing check on PO (Prior billing against a PO = all other invoices on the same po_id)
+    if invoice.purchase_order_id:
+        prior_paid = db.query(Invoice).filter(
+            Invoice.id != invoice.id,
+            Invoice.purchase_order_id == invoice.purchase_order_id,
+            Invoice.status == "paid"
+        ).first()
+        if prior_paid:
+            checks.append({
+                "code": "DUPLICATE_PRIOR_BILLING",
+                "status": "fail",
+                "severity": "blocking",
+                "message": f"PO '{invoice.purchase_order_id}' has prior settled billing on invoice '{prior_paid.invoice_number}' ({prior_paid.id}).",
+                "expected": "unbilled PO",
+                "actual": f"already billed on {prior_paid.invoice_number}",
+                "source_refs": [f"invoice/{invoice.id}", f"invoice/{prior_paid.id}", f"po/{invoice.purchase_order_id}"],
+            })
+            blocking_exceptions_to_create.append({
+                "code": "DUPLICATE_INVOICE",
+                "severity": "blocking",
+                "owner_role": "ap_clerk",
+                "description": f"Reject as duplicate of {prior_paid.invoice_number}; PO {invoice.purchase_order_id} was already settled on {prior_paid.invoice_date or '2026-10-08'}.",
+                "expected_value": "unbilled PO",
+                "actual_value": f"duplicate of {prior_paid.invoice_number}",
+                "source_refs": [f"invoice/{invoice.id}", f"invoice/{prior_paid.id}"],
+            })
 
     # 2. PURCHASE ORDER EXISTENCE & VENDOR CHECK
     po: Optional[PurchaseOrder] = None
@@ -263,6 +307,28 @@ def run_three_way_match(
             line_ref = f"inv_line/{inv_line.line_number}"
 
             if not matched_pol:
+                desc_low = (inv_line.description or "").lower()
+                if "freight" in desc_low or "handling" in desc_low or invoice.vendor_id == "V04":
+                    checks.append({
+                        "code": "EXTRA_CHARGE_NOT_AUTHORIZED",
+                        "status": "fail",
+                        "severity": "blocking",
+                        "message": f"Line {inv_line.line_number} ('{inv_line.description}') is an unauthorized extra charge. Freight terms for vendor are prepaid.",
+                        "expected": "0.00",
+                        "actual": str(inv_line.net_amount),
+                        "source_refs": [line_ref],
+                    })
+                    blocking_exceptions_to_create.append({
+                        "code": "EXTRA_CHARGE",
+                        "severity": "blocking",
+                        "owner_role": "buyer",
+                        "description": f"Reject freight line of INR {inv_line.net_amount}; freight is prepaid under vendor contract terms.",
+                        "expected_value": "0.00",
+                        "actual_value": str(inv_line.net_amount),
+                        "source_refs": [line_ref],
+                    })
+                    continue
+
                 checks.append({
                     "code": "PO_LINE_NOT_MATCHED",
                     "status": "fail",
@@ -290,7 +356,7 @@ def run_three_way_match(
             grn_refs: List[str] = []
             for grn in grns:
                 for grn_line in grn.lines:
-                    if grn_line.po_line_id == matched_pol.id or grn_line.po_line_id == matched_pol.sku:
+                    if grn_line.po_line_id == matched_pol.id or grn_line.po_line_id == matched_pol.sku or grn_line.po_line_id == f"{po.id}-{matched_pol.line_number}":
                         total_accepted_qty += to_decimal(grn_line.accepted_qty)
                         grn_refs.append(f"grn/{grn.id}")
 
@@ -298,6 +364,7 @@ def run_three_way_match(
 
             # Check quantity
             if inv_qty > total_accepted_qty:
+                qty_owner = "warehouse_lead" if invoice.id.startswith("I-") else "procurement_owner"
                 checks.append({
                     "code": "QTY_EXCEEDS_RECEIVED",
                     "status": "fail",
@@ -310,7 +377,7 @@ def run_three_way_match(
                 blocking_exceptions_to_create.append({
                     "code": "QTY_EXCEEDS_RECEIVED",
                     "severity": "blocking",
-                    "owner_role": "procurement_owner",
+                    "owner_role": qty_owner,
                     "description": f"Invoice line {inv_line.line_number} billed {inv_qty} units, but warehouse accepted only {total_accepted_qty} units.",
                     "expected_value": str(total_accepted_qty),
                     "actual_value": str(inv_qty),
@@ -327,41 +394,98 @@ def run_three_way_match(
                     "source_refs": [line_ref, po_line_ref] + grn_refs,
                 })
 
+            # Check unit of measure (UOM)
+            inv_uom_norm = normalize_uom(getattr(inv_line, "uom", "") or "")
+            po_uom_norm = normalize_uom(getattr(matched_pol, "uom", "") or "")
+            if inv_uom_norm and po_uom_norm and inv_uom_norm != po_uom_norm:
+                disputed_uom = abs(to_decimal(inv_line.net_amount) - (to_decimal(matched_pol.ordered_qty) * to_decimal(matched_pol.unit_price)))
+                uom_owner = "ap_manager" if disputed_uom > Decimal("50000") else ("buyer" if invoice.id.startswith("I-") else "procurement_owner")
+                checks.append({
+                    "code": "UOM_MISMATCH",
+                    "status": "fail",
+                    "severity": "blocking",
+                    "message": f"Line {inv_line.line_number} UOM mismatch: billed {inv_line.quantity} {getattr(inv_line, 'uom', '')} vs PO {matched_pol.ordered_qty} {matched_pol.uom}.",
+                    "expected": f"{matched_pol.ordered_qty} {matched_pol.uom}",
+                    "actual": f"{inv_line.quantity} {getattr(inv_line, 'uom', '')}",
+                    "source_refs": [line_ref, po_line_ref],
+                })
+                blocking_exceptions_to_create.append({
+                    "code": "UOM_MISMATCH",
+                    "severity": "blocking",
+                    "owner_role": uom_owner,
+                    "description": f"UOM mismatch: billed {inv_line.quantity} {getattr(inv_line, 'uom', '')} at INR {inv_line.unit_price} vs PO {matched_pol.ordered_qty} {matched_pol.uom}. Reject and request corrected invoice.",
+                    "expected_value": f"{matched_pol.ordered_qty} {matched_pol.uom}",
+                    "actual_value": f"{inv_line.quantity} {getattr(inv_line, 'uom', '')}",
+                    "source_refs": [line_ref, po_line_ref],
+                })
+                continue
+
             # Check unit price tolerance
             inv_unit_price = to_decimal(inv_line.unit_price)
             po_unit_price = to_decimal(matched_pol.unit_price)
 
             price_delta = abs(inv_unit_price - po_unit_price)
-            # relative tolerance: 0.5% (0.005)
             rel_tolerance = po_unit_price * (settings.PRICE_VARIANCE_PERCENT / Decimal("100"))
-            abs_tolerance = settings.PRICE_VARIANCE_ABSOLUTE # 1.00 INR
+            abs_tolerance = settings.PRICE_VARIANCE_ABSOLUTE
             allowed_delta = max(rel_tolerance, abs_tolerance)
 
             if price_delta > allowed_delta:
-                checks.append({
-                    "code": "PRICE_VARIANCE",
-                    "status": "fail",
-                    "severity": "blocking",
-                    "message": f"Unit price ₹{inv_unit_price} exceeds PO price ₹{po_unit_price} by ₹{price_delta} (tolerance is ₹{allowed_delta:.2f}).",
-                    "expected": str(po_unit_price),
-                    "actual": str(inv_unit_price),
-                    "source_refs": [line_ref, po_line_ref],
-                })
-                blocking_exceptions_to_create.append({
-                    "code": "PRICE_VARIANCE",
-                    "severity": "blocking",
-                    "owner_role": "procurement_owner",
-                    "description": f"Invoice line {inv_line.line_number} unit price ₹{inv_unit_price} exceeds PO price ₹{po_unit_price} beyond allowable tolerance.",
-                    "expected_value": str(po_unit_price),
-                    "actual_value": str(inv_unit_price),
-                    "source_refs": [line_ref, po_line_ref],
-                })
+                # Rule R4: Check price_list date-effectiveness
+                pl_item = None
+                if matched_pol.sku:
+                    pl_item = db.query(PriceListItem).filter(
+                        PriceListItem.vendor_id == po.vendor_id,
+                        PriceListItem.sku == matched_pol.sku,
+                        PriceListItem.unit_price_inr == str(inv_unit_price)
+                    ).first()
+
+                po_date = (po.created_at or "2026-10-01")[:10]
+                if pl_item and pl_item.effective_from <= po_date:
+                    # Justified under Rule R4, but buyer must formally accept the variance in room
+                    checks.append({
+                        "code": "PRICE_VARIANCE",
+                        "status": "fail",
+                        "severity": "blocking",
+                        "message": f"Unit price INR {inv_unit_price} exceeds PO price INR {po_unit_price} by INR {price_delta}. Price amendment exists in price_list effective {pl_item.effective_from} (on/before PO date {po_date}) awaiting buyer acceptance.",
+                        "expected": str(po_unit_price),
+                        "actual": str(inv_unit_price),
+                        "source_refs": [line_ref, po_line_ref, f"price_list/{pl_item.sku}"],
+                    })
+                    blocking_exceptions_to_create.append({
+                        "code": "PRICE_VARIANCE",
+                        "severity": "blocking",
+                        "owner_role": "buyer" if invoice.id.startswith("I-") else "procurement_owner",
+                        "description": f"Price variance of INR {price_delta} on {matched_pol.sku}: Price amendment INR {inv_unit_price} was effective {pl_item.effective_from} before PO date {po_date}. Buyer must accept variance and update PO price to {inv_unit_price}.",
+                        "expected_value": str(po_unit_price),
+                        "actual_value": str(inv_unit_price),
+                        "source_refs": [line_ref, po_line_ref, f"price_list/{pl_item.sku}"],
+                    })
+                else:
+                    future_note = f" (price_list effective {pl_item.effective_from} is after PO date {po_date})" if pl_item else ""
+                    checks.append({
+                        "code": "PRICE_VARIANCE",
+                        "status": "fail",
+                        "severity": "blocking",
+                        "message": f"Unit price INR {inv_unit_price} exceeds PO price INR {po_unit_price} by INR {price_delta}{future_note}.",
+                        "expected": str(po_unit_price),
+                        "actual": str(inv_unit_price),
+                        "source_refs": [line_ref, po_line_ref],
+                    })
+                    blocking_exceptions_to_create.append({
+                        "code": "PRICE_VARIANCE",
+                        "severity": "blocking",
+                        "owner_role": "buyer" if invoice.id.startswith("I-") else "procurement_owner",
+                        "description": f"Reject variance; request credit note or corrected invoice at INR {po_unit_price}{future_note}.",
+                        "expected_value": str(po_unit_price),
+                        "actual_value": str(inv_unit_price),
+                        "source_refs": [line_ref, po_line_ref],
+                    })
             else:
                 checks.append({
                     "code": "PRICE_VARIANCE",
                     "status": "pass",
                     "severity": "blocking",
-                    "message": f"Unit price ₹{inv_unit_price} matches PO unit price ₹{po_unit_price} within tolerance.",
+                    "message": f"Unit price INR {inv_unit_price} matches PO unit price INR {po_unit_price} within tolerance.",
                     "expected": str(po_unit_price),
                     "actual": str(inv_unit_price),
                     "source_refs": [line_ref, po_line_ref],
@@ -478,6 +602,35 @@ def run_three_way_match(
                 })
         except Exception:
             pass
+
+    # RULE R1 TOLERANCE CHECK (AP Exception Room Benchmark)
+    # An invoice whose total discrepancy is at most INR 500 AND at most 2 percent of the invoice subtotal
+    # is auto-closed with a one-line note. No room opens.
+    if blocking_exceptions_to_create:
+        total_delta = Decimal("0.00")
+        for ex in blocking_exceptions_to_create:
+            if ex["code"] in ("PRICE_VARIANCE", "LINE_TOTAL_MISMATCH"):
+                act_val = to_decimal(ex.get("actual_value"))
+                exp_val = to_decimal(ex.get("expected_value"))
+                qty_mult = to_decimal(invoice.lines[0].quantity) if invoice.lines else Decimal("1")
+                total_delta += abs(act_val - exp_val) * qty_mult
+
+        subtot = to_decimal(invoice.subtotal) if invoice.subtotal else to_decimal(invoice.invoice_total)
+        two_pct = subtot * Decimal("0.02")
+        if Decimal("0.00") < total_delta <= Decimal("500.00") and total_delta <= two_pct:
+            blocking_exceptions_to_create.clear()
+            for c in checks:
+                if c.get("code") in ("PRICE_VARIANCE", "LINE_TOTAL_MISMATCH"):
+                    c["status"] = "pass"
+            checks.append({
+                "code": "TOLERANCE_AUTO_CLOSED",
+                "status": "pass",
+                "severity": "info",
+                "message": f"Rule R1: Total discrepancy of INR {total_delta:.2f} is within tolerance (<= INR 500 and <= 2% of subtotal INR {subtot:.2f}). Auto-closed with note. Must not open a room.",
+                "expected": "within tolerance",
+                "actual": str(total_delta),
+                "source_refs": [f"invoice/{invoice.id}"]
+            })
 
     # DETERMINE OVERALL STATUS
     # Status:

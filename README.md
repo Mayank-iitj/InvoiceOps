@@ -189,6 +189,32 @@ curl -X POST http://localhost:8000/api/v1/switch/mcp/invoke \
 
 ---
 
+## 📱 Telegram Chat Gateway (@switch_devops_bot)
+
+InvoiceOps includes a fully configured **Telegram Chat Gateway** powered by [@switch_devops_bot](https://t.me/switch_devops_bot) that connects users directly to the `#invoiceops-ap` collaborative room:
+
+- **Bot Username**: `@switch_devops_bot`
+- **Token Configuration**: Configured in `.env` (`TELEGRAM_BOT_TOKEN`)
+- **Key Commands**:
+  - `/start` - Welcome message & quick guide
+  - `/invoices` - List loaded cases & current reconciliation status
+  - `/status` - System health, ledger counts, and connector states
+  - `/inspect <id>` - Ingest & OCR extract candidate lines (`invoiceops-intake`)
+  - `/reconcile <id>` - Run deterministic 3-way match (`invoiceops-reconcile`)
+  - `/override <id>` - Apply procurement Addendum #A-42 (rate delta authorized)
+  - `/approve <id>` - Human Finance Approver sign-off; generates sealed payment voucher
+  - `/simulate` - Run complete 6-step collaborative triage demo
+  - `/audit <id>` - Query cryptographic append-only audit trail
+  - *Conversational Chat* - Speak in natural language with your autonomous AI teammates
+- **Push Alerts**: Live push notifications sent to Telegram whenever exceptions are detected or payment-ready vouchers are sealed.
+- **CLI Commands**:
+  ```bash
+  python backend/cli.py telegram status
+  python backend/cli.py telegram poll
+  ```
+
+---
+
 ## 🚀 Quick Start & Deployment Guide
 
 InvoiceOps is engineered to boot seamlessly across any development or production environment in seconds.

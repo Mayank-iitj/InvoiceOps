@@ -157,6 +157,7 @@ class InvoiceLine(Base):
     line_number = Column(Integer, nullable=False)
     sku = Column(String, nullable=True)
     description = Column(String, nullable=False)
+    uom = Column(String, nullable=True, default="EA")
     quantity = Column(String, nullable=False)
     unit_price = Column(String, nullable=False)
     net_amount = Column(String, nullable=False)
@@ -339,5 +340,88 @@ class SwitchMessage(Base):
     __table_args__ = (
         Index("idx_switch_room_thread_time", "room_id", "thread_id", "created_at"),
     )
+
+
+class DeliveryChallan(Base):
+    __tablename__ = "delivery_challans"
+
+    id = Column(String, primary_key=True)
+    po_id = Column(String, nullable=False)
+    vendor_id = Column(String, nullable=False)
+    sku = Column(String, nullable=False)
+    uom = Column(String, nullable=False)
+    qty_dispatched = Column(String, nullable=False)
+    dispatch_date = Column(String, nullable=False)
+
+
+class PriceListItem(Base):
+    __tablename__ = "price_list"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    vendor_id = Column(String, nullable=False)
+    sku = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    uom = Column(String, nullable=False)
+    unit_price_inr = Column(String, nullable=False)
+    effective_from = Column(String, nullable=False)
+    effective_to = Column(String, nullable=True)
+    note = Column(String, nullable=True)
+
+
+class VendorHistory(Base):
+    __tablename__ = "vendor_history"
+
+    id = Column(String, primary_key=True)
+    vendor_id = Column(String, nullable=False)
+    date = Column(String, nullable=False)
+    issue_type = Column(String, nullable=False)
+    amount_inr = Column(String, nullable=False)
+    resolution = Column(String, nullable=False)
+    resolved_by = Column(String, nullable=False)
+
+
+class RoomRule(Base):
+    __tablename__ = "room_rules"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    text = Column(Text, nullable=False)
+
+
+class BenchmarkRole(Base):
+    __tablename__ = "benchmark_roles"
+
+    id = Column(String, primary_key=True)
+    person = Column(String, nullable=False)
+    chat_username = Column(String, nullable=True)
+    authority = Column(Text, nullable=False)
+
+
+class ScriptedHumanReply(Base):
+    __tablename__ = "scripted_human_replies"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    invoice_id = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    question = Column(Text, nullable=False)
+    scripted_reply = Column(Text, nullable=False)
+
+
+class BenchmarkAnswerKey(Base):
+    __tablename__ = "benchmark_answer_key"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    scenario = Column(String, nullable=False)
+    invoice_id = Column(String, nullable=False)
+    invoice_no = Column(String, nullable=False)
+    expected_route = Column(String, nullable=False)
+    expected_cause = Column(String, nullable=True)
+    expected_resolution = Column(Text, nullable=True)
+    deciding_role = Column(String, nullable=True)
+    disputed_amount_inr_pre_gst = Column(String, nullable=True)
+    max_human_questions = Column(Integer, nullable=True)
+    key_evidence = Column(Text, nullable=True)
+    trap = Column(Text, nullable=True)
+
 
 

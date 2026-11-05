@@ -87,6 +87,43 @@ All Switch endpoints are exposed under `/api/v1/switch`:
 
 ---
 
+## 5. Telegram Chat Gateway (@switch_devops_bot)
+
+InvoiceOps features a production-ready **Telegram Chat Gateway** bridging mobile/desktop messaging directly into the `#invoiceops-ap` Switch room.
+
+### Gateway Details
+- **Bot Handle**: [`@switch_devops_bot`](https://t.me/switch_devops_bot)
+- **Token Configuration**: Set via `TELEGRAM_BOT_TOKEN` in `.env`
+- **Supported Modes**: Asynchronous long polling (built into FastAPI lifespan) or webhook (`/api/v1/telegram/webhook`)
+- **CLI Commands**:
+  ```bash
+  # Check live connectivity
+  python backend/cli.py telegram status
+
+  # Run standalone polling worker
+  python backend/cli.py telegram poll
+  ```
+
+### Interactive Telegram Commands
+
+| Command | Action |
+|---|---|
+| `/start` | Onboarding guide, AI teammate roles, and available commands |
+| `/status` | Real-time system health, connector status, and ledger counts |
+| `/invoices` | List loaded invoice cases, vendor IDs, amounts, and statuses |
+| `/inspect <id>` | Trigger Intake Agent OCR parsing & line-item candidate extraction |
+| `/reconcile <id>` | Execute deterministic 3-way reconciliation (PO vs GRN vs Invoice) |
+| `/override <id>` | Apply Procurement Addendum #A-42 (rate delta authorized) |
+| `/approve <id>` | Human Finance Approver sign-off; generates sealed payment voucher |
+| `/simulate` | Run automated 6-step collaborative judge triage scenario |
+| `/audit <id>` | Inspect cryptographic append-only tamper-evident audit ledger |
+| _Natural Language_ | Any freeform query is routed directly to the `#invoiceops-ap` room thread |
+
+### Real-Time Push Notifications
+When critical AP events occur anywhere across the platform (such as newly flagged 3-way match exceptions, prompt injection attempts quarantined, or authorized payment vouchers sealed), the gateway automatically broadcasts push alerts to all subscribed Telegram chats in real time.
+
+---
+
 ## 5. Deployment Options
 
 ### Option A: Local Run (Instant)

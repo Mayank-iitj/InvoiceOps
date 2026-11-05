@@ -1,0 +1,24 @@
+vendor_id,sku,description,uom,unit_price_inr,effective_from,effective_to,note
+V01,SKU-101,Hydraulic hose 1/2in 10m,EA,1850,2026-04-01,,
+V01,SKU-103,Hose clamp SS pack of 10,PK,240,2026-04-01,,
+V01,SKU-104,Hydraulic elbow fitting 90deg,EA,145,2026-04-01,,
+V01,SKU-105,Pipe sealant tube 50g,EA,62,2026-04-01,,
+V01,SKU-106,Hex bolt M12 (box of 100),BOX,920,2026-04-01,,"Price is per BOX of 100 pieces, not per piece"
+V02,SKU-201,Corrugated box 5-ply 18x12x10,EA,38,2026-04-01,,
+V02,SKU-202,Packing tape 48mm 100m,ROLL,62,2026-04-01,,
+V02,SKU-203,Stretch film 500mm 20mic,ROLL,395,2026-04-01,2026-09-14,Superseded by amendment KP/PA/09-2026
+V02,SKU-203,Stretch film 500mm 20mic,ROLL,410,2026-09-15,,Amendment notice KP/PA/09-2026 dated 2026-09-10; effective 2026-09-15
+V02,SKU-204,Bubble wrap 1m x 50m,ROLL,540,2026-04-01,,
+V03,SKU-301,MCB 32A 2-pole,EA,410,2026-04-01,,
+V03,SKU-302,Copper cable 2.5mm 90m,COIL,2150,2026-04-01,,
+V03,SKU-303,LED panel light 40W,EA,620,2026-06-01,2026-10-19,
+V03,SKU-303,LED panel light 40W,EA,695,2026-10-20,,Revision notice HE/PR/10-2026 dated 2026-10-12; effective 2026-10-20
+V04,SKU-401,Safety helmet,EA,285,2026-04-01,,
+V04,SKU-402,Safety gloves,PAIR,78,2026-04-01,,
+V04,SKU-404,Fire extinguisher 4kg ABC,EA,1180,2026-04-01,,
+V04,SKU-405,First aid kit,EA,640,2026-04-01,,
+V05,SKU-501,A4 paper 75gsm,REAM,268,2026-04-01,,
+V05,SKU-502,Marker box (12 pcs),BOX,156,2026-04-01,,
+V05,SKU-503,Mesh office chair,EA,3450,2026-04-01,,
+V05,SKU-505,Wireless keyboard,EA,890,2026-04-01,,
+V05,SKU-506,Mouse pad,EA,95,2026-04-01,,

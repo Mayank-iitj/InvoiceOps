@@ -1,0 +1,9 @@
+invoice_id,role,question,scripted_reply
+I-2006,warehouse_lead,Did 200 units of SKU-104 arrive against PO-7006?,No. 160 arrived. The other 40 are on backorder.
+I-2007,buyer,Do you accept the unit price of 695 for SKU-303 on PO-7007?,No. Do not accept. Ask the vendor for a credit note or corrected invoice at 620.
+I-2008,buyer,Do you accept the unit price of 410 for SKU-203 given the amendment?,Yes. Accept the variance and update the PO price to 410.
+I-2009,ap_manager,"Do you approve rejecting INV-V01-2214 (disputed INR 1,821,600)?",Approved. Reject it and request a corrected invoice. Do not pay.
+I-2010,ap_clerk,Was BOM-5490 for the same 12 chairs already paid?,Yes. BOM-5490 was paid on 2026-10-08. Reject BOM-5602.
+I-2011,buyer,"Do you accept the freight and handling line of INR 2,400?",No. Freight is prepaid under the contract. Reject that line.
+I-2012,warehouse_lead,Did 40 units of SKU-505 arrive against PO-7011? (first ask),"Received in full, 40."
+I-2012,warehouse_lead,"GRN-4420 and DC-V05-020 both show 32. Can you recount? (second ask, after evidence is shown)",Recounted the pallets. 32 confirmed. 8 are missing.

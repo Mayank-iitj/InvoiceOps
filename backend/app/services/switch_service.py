@@ -22,6 +22,7 @@ from backend.app.models.all_models import (
 from backend.app.services.matching_engine import run_three_way_match
 from backend.app.services.approval_service import process_approval_decision
 from backend.app.services.audit_service import log_audit_event
+from backend.app.services.telegram_service import telegram_gateway
 
 logger = logging.getLogger("invoiceops.switch")
 
@@ -149,6 +150,11 @@ class SwitchService:
             "active_humans": [HUMAN_CLERK, HUMAN_PROCUREMENT, HUMAN_FINANCE],
             "connectors": {
                 "switch_core": {"status": "connected", "type": "websocket_and_rest"},
+                "telegram": {
+                    "status": "connected" if settings.TELEGRAM_GATEWAY_ENABLED else "disabled",
+                    "bot": settings.TELEGRAM_BOT_USERNAME,
+                    "gateway": "active"
+                },
                 "mattermost": {"status": "configured", "channel": "~invoiceops-ap"},
                 "slack": {"status": "ready", "channel": "#invoiceops-ap"},
                 "teams": {"status": "ready", "team": "Finance Operations"},
@@ -309,6 +315,9 @@ class SwitchService:
                 action_payload={"threat": "PROMPT_INJECTION", "status": "QUARANTINED"},
                 auto_react=False
             )
+            telegram_gateway.sync_broadcast_notification(
+                f"🚨 *[InvoiceOps Security Alert]*: Adversarial prompt injection quarantined on `{target_id}`."
+            )
             return
 
         # ---------------------------------------------------------------------
@@ -412,6 +421,10 @@ class SwitchService:
                     action_payload={"invoice_id": inv.id, "status": status, "exception_count": len(ex_list)},
                     auto_react=False
                 )
+                if ex_list:
+                    telegram_gateway.sync_broadcast_notification(
+                        f"⚠️ *[InvoiceOps Alert]*: 3-way match flagged {len(ex_list)} exception(s) on `{inv.id}`."
+                    )
             return
 
         # ---------------------------------------------------------------------
@@ -577,6 +590,9 @@ class SwitchService:
                         "status": "COMPLETED"
                     },
                     auto_react=False
+                )
+                telegram_gateway.sync_broadcast_notification(
+                    f"🎉 *[InvoiceOps Voucher Sealed]*: `{target_id}` approved for ₹{pay_rec.approved_amount} {pay_rec.currency}. Voucher ID: `{pay_rec.id}`."
                 )
             except Exception as e:
                 SwitchService.post_message(

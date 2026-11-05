@@ -25,5 +25,11 @@ class Settings:
     POLICY_VERSION: str = "demo-policy-1.0"
     AUDIT_RETENTION_DAYS: int = int(os.getenv("AUDIT_RETENTION_DAYS", "365"))
 
+    # Telegram Chat Gateway
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "9009274250:AAHu5tG-ZXH_2383UCWM1nssBUcV-8OEKcI")
+    TELEGRAM_BOT_USERNAME: str = os.getenv("TELEGRAM_BOT_USERNAME", "@switch_devops_bot")
+    TELEGRAM_GATEWAY_ENABLED: bool = os.getenv("TELEGRAM_GATEWAY_ENABLED", "true").lower() in ("true", "1", "yes")
+    TELEGRAM_POLLING: bool = os.getenv("TELEGRAM_POLLING", "true").lower() in ("true", "1", "yes")
+
 settings = Settings()
 

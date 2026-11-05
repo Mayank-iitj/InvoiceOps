@@ -1,0 +1,5 @@
+role,person,chat_username,authority
+ap_clerk,Meera Joshi,,Runs the match; sole person who may type SEND for any vendor message; closes within-tolerance items
+warehouse_lead,Imran Qureshi,,Sole authority to confirm quantities physically received
+buyer,Ananya Rao / Rohit Menon,,Sole authority to accept a price variance or approve a price-master update (the buyer on the PO)
+ap_manager,Sanjay Kulkarni,,"Must approve any decision where the disputed amount exceeds INR 50,000; may override"

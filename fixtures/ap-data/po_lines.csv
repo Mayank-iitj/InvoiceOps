@@ -1,0 +1,22 @@
+po_id,line_no,vendor_id,po_date,buyer,sku,description,uom,qty_ordered,unit_price_inr,line_amount_inr
+PO-6990,1,V05,2026-09-15,Rohit Menon,SKU-503,Mesh office chair,EA,12,3450,41400
+PO-7001,1,V01,2026-09-29,Ananya Rao,SKU-101,Hydraulic hose 1/2in 10m,EA,12,1850,22200
+PO-7001,2,V01,2026-09-29,Ananya Rao,SKU-103,Hose clamp SS pack of 10,PK,30,240,7200
+PO-7002,1,V02,2026-09-30,Rohit Menon,SKU-201,Corrugated box 5-ply 18x12x10,EA,500,38,19000
+PO-7002,2,V02,2026-09-30,Rohit Menon,SKU-202,Packing tape 48mm 100m,ROLL,120,62,7440
+PO-7003,1,V03,2026-09-30,Ananya Rao,SKU-301,MCB 32A 2-pole,EA,40,410,16400
+PO-7003,2,V03,2026-09-30,Ananya Rao,SKU-302,Copper cable 2.5mm 90m,COIL,12,2150,25800
+PO-7004,1,V04,2026-10-01,Rohit Menon,SKU-401,Safety helmet,EA,60,285,17100
+PO-7004,2,V04,2026-10-01,Rohit Menon,SKU-402,Safety gloves,PAIR,200,78,15600
+PO-7005,1,V05,2026-10-01,Ananya Rao,SKU-501,A4 paper 75gsm,REAM,100,268,26800
+PO-7005,2,V05,2026-10-01,Ananya Rao,SKU-502,Marker box (12 pcs),BOX,20,156,3120
+PO-7006,1,V01,2026-10-01,Ananya Rao,SKU-104,Hydraulic elbow fitting 90deg,EA,200,145,29000
+PO-7006,2,V01,2026-10-01,Ananya Rao,SKU-105,Pipe sealant tube 50g,EA,100,62,6200
+PO-7007,1,V03,2026-10-02,Rohit Menon,SKU-303,LED panel light 40W,EA,80,620,49600
+PO-7008,1,V02,2026-09-22,Rohit Menon,SKU-203,Stretch film 500mm 20mic,ROLL,150,395,59250
+PO-7008,2,V02,2026-09-22,Rohit Menon,SKU-204,Bubble wrap 1m x 50m,ROLL,40,540,21600
+PO-7009,1,V01,2026-10-05,Ananya Rao,SKU-106,Hex bolt M12 (box of 100),BOX,20,920,18400
+PO-7010,1,V04,2026-10-07,Rohit Menon,SKU-404,Fire extinguisher 4kg ABC,EA,30,1180,35400
+PO-7010,2,V04,2026-10-07,Rohit Menon,SKU-405,First aid kit,EA,25,640,16000
+PO-7011,1,V05,2026-10-08,Ananya Rao,SKU-505,Wireless keyboard,EA,40,890,35600
+PO-7011,2,V05,2026-10-08,Ananya Rao,SKU-506,Mouse pad,EA,100,95,9500

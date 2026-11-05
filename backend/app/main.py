@@ -1,5 +1,6 @@
 import time
 import uuid
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -21,8 +22,10 @@ from backend.app.api.v1 import (
     vendors,
     demo,
     switch_rooms,
+    telegram_gateway,
 )
 from backend.app.services.seed_service import seed_database
+from backend.app.services.telegram_service import telegram_gateway as tg_service
 from backend.app.models.all_models import Invoice
 
 # Ensure tables are created
@@ -35,6 +38,23 @@ with SessionLocal() as db:
             seed_database(db, run_initial_match=True)
         except Exception:
             pass
+    if db.query(Invoice).filter(Invoice.id == "I-2001").count() == 0:
+        try:
+            from backend.app.services.ap_data_loader import feed_ap_data
+            feed_ap_data(db, run_matches=True)
+        except Exception:
+            pass
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Start Telegram Gateway polling in background if configured
+    if settings.TELEGRAM_GATEWAY_ENABLED and settings.TELEGRAM_POLLING:
+        tg_service.start_polling_in_background()
+    yield
+    # Shutdown: Cleanly cancel polling task
+    tg_service.stop_polling()
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -43,6 +63,7 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # CORS
@@ -113,6 +134,7 @@ app.include_router(audit.router, prefix="/api/v1")
 app.include_router(vendors.router, prefix="/api/v1")
 app.include_router(demo.router, prefix="/api/v1")
 app.include_router(switch_rooms.router, prefix="/api/v1")
+app.include_router(telegram_gateway.router, prefix="/api/v1")
 
 # Mount built frontend SPA if available
 import os

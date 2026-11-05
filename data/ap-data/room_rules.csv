@@ -1,0 +1,9 @@
+rule_id,name,text
+R1,Tolerance,An invoice whose total discrepancy is at most INR 500 AND at most 2 percent of the invoice subtotal is auto-closed with a one-line note. No room opens.
+R2,Citations,"Every factual claim cites file name and row, e.g. goods_receipts.csv GRN-4412. A claim without a citation is not allowed; say unknown instead."
+R3,Received quantity,"Only the warehouse_lead can confirm received quantity. If a human statement conflicts with goods_receipts.csv or delivery_challans.csv, classify as conflict and ask the warehouse_lead to recount."
+R4,Price variance,Only the buyer on the PO can accept a price variance. A price counts as justified only if a price_list.csv row was effective on or before the PO date.
+R5,Approval threshold,"If the disputed amount (before GST) exceeds INR 50,000, the ap_manager must approve the decision."
+R6,Questions,"Evidence agent asks at most 2 questions per room, each yes/no, each addressed to one role."
+R7,External messages,Agents draft only. Nothing goes to a vendor until the ap_clerk types SEND.
+R8,Closing,"Each room ends with a decision record: cause, evidence cited, who decided, action, amount."

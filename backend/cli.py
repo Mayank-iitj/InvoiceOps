@@ -209,6 +209,61 @@ def cmd_exception_list(args):
     finally:
         db.close()
 
+def cmd_telegram_status(args):
+    import asyncio
+    from backend.app.services.telegram_service import telegram_gateway, _load_subscribers
+    from backend.app.config import settings
+    configured = telegram_gateway.is_configured()
+    bot_info = asyncio.run(telegram_gateway.get_me()) if configured else {}
+    subs = _load_subscribers()
+    print(json.dumps({
+        "status": "connected" if configured and "id" in bot_info else ("configured" if configured else "disabled"),
+        "bot_username": settings.TELEGRAM_BOT_USERNAME,
+        "polling_active": telegram_gateway._is_running,
+        "subscribers_count": len(subs),
+        "bot_details": bot_info
+    }, indent=2))
+
+def cmd_telegram_poll(args):
+    import asyncio
+    from backend.app.services.telegram_service import telegram_gateway
+    print(f"Starting Telegram Gateway polling for {telegram_gateway.bot_username}...")
+    try:
+        asyncio.run(telegram_gateway.poll_updates())
+    except KeyboardInterrupt:
+        print("\nStopping Telegram Gateway polling.")
+
+def cmd_telegram_set_webhook(args):
+    import asyncio
+    from backend.app.services.telegram_service import telegram_gateway
+    url = args.url
+    print(f"Setting Telegram webhook to: {url}")
+    res = asyncio.run(telegram_gateway.set_webhook(url))
+    print(json.dumps(res, indent=2))
+
+def cmd_telegram_delete_webhook(args):
+    import asyncio
+    from backend.app.services.telegram_service import telegram_gateway
+    print("Deleting Telegram webhook...")
+    res = asyncio.run(telegram_gateway.delete_webhook())
+    print(json.dumps(res, indent=2))
+
+def cmd_telegram_webhook_info(args):
+    import asyncio
+    from backend.app.services.telegram_service import telegram_gateway
+    res = asyncio.run(telegram_gateway.get_webhook_info())
+    print(json.dumps(res, indent=2))
+
+def cmd_feed_ap_data(args):
+    from backend.app.database import SessionLocal
+    from backend.app.services.ap_data_loader import feed_ap_data
+    db = SessionLocal()
+    try:
+        res = feed_ap_data(db, run_matches=True)
+        print(json.dumps({"status": "ap_data_fed", "counts": res}, indent=2))
+    finally:
+        db.close()
+
 def main():
     parser = argparse.ArgumentParser(prog="invoiceops", description="InvoiceOps CLI tool for AP operations and Switch agents")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -262,6 +317,25 @@ def main():
     p_exc_list = exc_subs.add_parser("list", help="List exceptions for case")
     p_exc_list.add_argument("case_id", help="Invoice case ID")
     p_exc_list.set_defaults(func=cmd_exception_list)
+
+    # Telegram Gateway
+    p_tg = subparsers.add_parser("telegram", help="Telegram Chat Gateway operations")
+    tg_subs = p_tg.add_subparsers(dest="tg_command", required=True)
+    p_tg_status = tg_subs.add_parser("status", help="Show Telegram bot connectivity status")
+    p_tg_status.set_defaults(func=cmd_telegram_status)
+    p_tg_poll = tg_subs.add_parser("poll", help="Run Telegram bot long polling worker")
+    p_tg_poll.set_defaults(func=cmd_telegram_poll)
+    p_tg_set_wh = tg_subs.add_parser("set-webhook", help="Set Telegram webhook URL")
+    p_tg_set_wh.add_argument("url", help="Public HTTPS webhook URL")
+    p_tg_set_wh.set_defaults(func=cmd_telegram_set_webhook)
+    p_tg_del_wh = tg_subs.add_parser("delete-webhook", help="Delete Telegram webhook")
+    p_tg_del_wh.set_defaults(func=cmd_telegram_delete_webhook)
+    p_tg_wh_info = tg_subs.add_parser("webhook-info", help="Get Telegram webhook status")
+    p_tg_wh_info.set_defaults(func=cmd_telegram_webhook_info)
+
+    # Feed AP Data
+    p_feed = subparsers.add_parser("feed-ap-data", help="Ingest official AP exception benchmark dataset")
+    p_feed.set_defaults(func=cmd_feed_ap_data)
 
     args = parser.parse_args()
     args.func(args)
