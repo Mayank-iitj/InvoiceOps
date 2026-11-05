@@ -88,8 +88,7 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
     const el = ref.current;
     if (!el) return undefined;
 
-    let scroller: any = container || document.getElementById('snap-main-container') || null;
-    if (typeof scroller === 'string') scroller = document.querySelector(scroller);
+    let scroller: any = container ? (typeof container === 'string' ? document.querySelector(container) : container) : undefined;
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -103,6 +102,7 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
       gsap.set(el, { visibility: 'visible' });
 
       if (reduce) {
+        gsap.set(targets, { opacity: 1, x: 0, y: 0, scale: 1 });
         callbacksRef.current.onComplete?.();
         return;
       }
@@ -184,7 +184,7 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
       if (scrub) {
         ScrollTrigger.create({
           trigger: el,
-          scroller,
+          scroller: scroller || undefined,
           start,
           end: `top ${Math.max((1 - threshold) * 100 - 45, 5)}%`,
           scrub: scrub === true ? true : Math.max(Number(scrub) || 0, 0.01),
@@ -195,7 +195,7 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
 
       ScrollTrigger.create({
         trigger: el,
-        scroller,
+        scroller: scroller || undefined,
         start,
         once,
         onEnter: () => tl.play(),
@@ -206,6 +206,12 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
               tl.reverse();
             }
       });
+
+      // Fail-safe check: If element is already in view on mount, play immediately
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.95) {
+        tl.play();
+      }
     }, el);
 
     return () => ctx.revert();
@@ -236,7 +242,7 @@ export const AnimatedContent: React.FC<AnimatedContentProps> = ({
   ]);
 
   return (
-    <div ref={ref} className={className} style={{ visibility: 'hidden', ...style }} {...props}>
+    <div ref={ref} className={className} style={{ ...style }} {...props}>
       {children}
     </div>
   );

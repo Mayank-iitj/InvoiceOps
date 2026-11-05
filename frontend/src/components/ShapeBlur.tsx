@@ -798,3 +798,4 @@ export const ShapeBlur: React.FC<ShapeBlurProps> = ({
 };
 
 export default ShapeBlur;
+
